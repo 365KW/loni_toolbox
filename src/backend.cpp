@@ -1,12 +1,7 @@
-//
-// Created by kyyou on 2026/2/17.
-//
-
 #include "backend.h"
 #include <QCryptographicHash>
 #include <QRegularExpression>
 #include <QSettings>
-#include <QUrl>
 #include <QImage>
 #include <QPainter>
 #include <QScreen>
@@ -18,6 +13,9 @@
 #include <random>
 #include <cmath>
 #include <QtZlib/zlib.h>
+#include <QJsonObject>
+#include <QDir>
+#include <QFile>
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -500,14 +498,14 @@ namespace text_diff {
                       ".ins { background-color: #e6ffe6; color: #388e3c; }"
                       ".line { font-family: monospace; white-space: pre-wrap; padding: 2px 4px; }"
                       "</style></head><body>";
-        
+
         QStringList lines = result.original.split('\n');
         QSet<int> removedLines;
-        
+
         for (const auto &key: result.diff_ranges | std::views::keys)
             if (key < 0)
                 removedLines.insert(-key - 1);
-        
+
         for (int i = 0; i < lines.size(); i++) {
             if (removedLines.contains(i))
                 html += QString("<div class=\"line del\">- %1</div>").arg(lines[i].toHtmlEscaped());
@@ -515,7 +513,7 @@ namespace text_diff {
                 html += QString("<div class=\"line\">  %1</div>").arg(lines[i].toHtmlEscaped());
 
         }
-        
+
         html += "</body></html>";
         return html;
     }
@@ -743,62 +741,107 @@ namespace password_gen {
     }
 }
 
-// ==================== 设置管理 ====================
-namespace settings {
-    static QSettings *app_settings = nullptr;
-    
-    bool load_settings() {
-        if (!app_settings)
-            app_settings = new QSettings("WhatIDo", "Tools");
-        return true;
-    }
-    
-    void cleanup_settings()
-    {
-        delete app_settings;
-        app_settings = nullptr;
-    }
-    
-    bool save_settings()
-    {
-        if (app_settings)
-        {
-            app_settings->sync();
-            return true;
-        }
-        return false;
-    }
-    
-    bool get_shortcut_enabled() {
-        if (app_settings) {
-            return app_settings->value("shortcuts/enabled", true).toBool();
-        }
-        return true;
-    }
-    
-    void set_shortcut_enabled(bool enabled) {
-        if (app_settings) {
-            app_settings->setValue("shortcuts/enabled", enabled);
-        }
-    }
-    
-    QString get_tool_config(const QString &tool_name) {
-        if (app_settings) {
-            return app_settings->value("tools/" + tool_name).toString();
-        }
-        return {};
-    }
-    
-    void set_tool_config(const QString &tool_name, const QString &config) {
-        if (app_settings) {
-            app_settings->setValue("tools/" + tool_name, config);
-        }
-    }
-}
-
 namespace common_backend
 {
-    void save_config() {
+    void save_config(const bool darkmode)
+    {
+        const auto dirPath = QStringLiteral("./config");
+        const QString filePath = dirPath + QStringLiteral("/config.json");
 
+        if (const QDir dir(dirPath); !dir.exists()) {
+            if (!QDir().mkpath(dirPath)) {
+                qWarning("common_backend::save_config: failed to create config directory '%s'", qPrintable(dirPath));
+            }
+        }
+
+        QJsonObject config_obj;
+        config_obj[QStringLiteral("darkmode")] = darkmode;
+
+        const QJsonDocument doc(config_obj);
+        const QByteArray out = doc.toJson(QJsonDocument::Compact);
+
+        QSaveFile saveFile(filePath);
+        if (!saveFile.open(QIODevice::WriteOnly))
+        {
+            qWarning("common_backend::save_config: failed to open '%s' for writing: %s", qPrintable(filePath), qPrintable(saveFile.errorString()));
+            QFile fallback(filePath);
+            if (!fallback.open(QIODevice::WriteOnly))
+            {
+                qWarning("common_backend::save_config: fallback QFile also failed to open '%s': %s", qPrintable(filePath), qPrintable(fallback.errorString()));
+                return;
+            }
+            fallback.write(out);
+            fallback.close();
+            return;
+        }
+
+        if (saveFile.write(out) == -1) {
+            qWarning("common_backend::save_config: write failed for '%s': %s", qPrintable(filePath), qPrintable(saveFile.errorString()));
+            return;
+        }
+
+        if (!saveFile.commit()) {
+            qWarning("common_backend::save_config: commit failed for '%s': %s", qPrintable(filePath), qPrintable(saveFile.errorString()));
+            return;
+        }
+    }
+
+    bool read_config()
+    {
+        const QString dirPath = QStringLiteral("./config");
+        const QString filePath = dirPath + QStringLiteral("/config.json");
+
+        QFile file(filePath);
+
+        // If file doesn't exist, create default and try again
+        if (!file.exists()) {
+            save_config(false);
+        }
+
+        if (!file.open(QIODevice::ReadOnly)) {
+            qWarning("common_backend::read_config: failed to open '%s' for reading: %s", qPrintable(filePath), qPrintable(file.errorString()));
+            // Try recreate default config
+            save_config(false);
+            if (!file.open(QIODevice::ReadOnly)) {
+                qWarning("common_backend::read_config: still failed to open '%s' after creating default", qPrintable(filePath));
+                return false;
+            }
+        }
+
+        const QByteArray data = file.readAll();
+        file.close();
+
+        QJsonParseError parseError;
+        const QJsonDocument doc = QJsonDocument::fromJson(data, &parseError);
+
+        if (doc.isNull() || !doc.isObject()) {
+            qWarning("common_backend::read_config: config file '%s' is invalid: %s", qPrintable(filePath), qPrintable(parseError.errorString()));
+
+            // Attempt to remove invalid file and recreate default
+            if (!QFile::remove(filePath)) {
+                qWarning("common_backend::read_config: failed to remove invalid config '%s'", qPrintable(filePath));
+            }
+
+            save_config(false);
+
+            // Try reading the recreated default
+            QFile file2(filePath);
+            if (!file2.open(QIODevice::ReadOnly)) {
+                qWarning("common_backend::read_config: failed to open recreated default config '%s'", qPrintable(filePath));
+                return false;
+            }
+            const QByteArray data2 = file2.readAll();
+            file2.close();
+
+            const QJsonDocument doc2 = QJsonDocument::fromJson(data2, &parseError);
+            if (doc2.isNull() || !doc2.isObject()) {
+                qWarning("common_backend::read_config: recreated default config is invalid for '%s'", qPrintable(filePath));
+                return false;
+            }
+
+            return doc2.object().value(QStringLiteral("darkmode")).toBool(false);
+        }
+
+        return doc.object().value(QStringLiteral("darkmode")).toBool(false);
     }
 }

@@ -24,6 +24,7 @@
 #include <QDate>
 
 main_window::main_window(QWidget *parent) : QMainWindow(parent) {
+    darkmode_ = common_backend::read_config();
     QApplication::setStyle(QStyleFactory::create("Fusion"));
     setup_ui();
     set_style_();
@@ -229,11 +230,13 @@ QWidget* main_window::create_image_resizer_page() {
     auto *layout = get_content_layout(page);
 
     image_width_spin_ = new QSpinBox(page);
+    image_width_spin_->setButtonSymbols(QAbstractSpinBox::PlusMinus);
     image_width_spin_->setSuffix(" px");
     image_width_spin_->setRange(1, 10000);
     image_width_spin_->setValue(800);
     
     image_height_spin_ = new QSpinBox(page);
+    image_height_spin_->setButtonSymbols(QAbstractSpinBox::PlusMinus);
     image_height_spin_->setSuffix(" px");
     image_height_spin_->setRange(1, 10000);
     image_height_spin_->setValue(600);
@@ -307,11 +310,13 @@ QWidget* main_window::create_base_converter_page() {
     auto *layout = get_content_layout(page);
 
     base_from_spin_ = new QSpinBox(page);
-    base_from_spin_->setRange(2, 60);
+    base_from_spin_->setButtonSymbols(QAbstractSpinBox::PlusMinus),
+    base_from_spin_->setRange(2, 60),
     base_from_spin_->setValue(10);
     
     base_to_spin_ = new QSpinBox(page);
-    base_to_spin_->setRange(2, 60);
+    base_to_spin_->setButtonSymbols(QAbstractSpinBox::PlusMinus),
+    base_to_spin_->setRange(2, 60),
     base_to_spin_->setValue(16);
     
     base_input_ = new QLineEdit(page);
@@ -377,6 +382,7 @@ QWidget* main_window::create_timestamp_page() {
     timestamp_year_ = new QSpinBox(page);
     timestamp_year_->setRange(1970, 2100);
     timestamp_year_->setValue(QDate::currentDate().year());
+    timestamp_year_->setButtonSymbols(QAbstractSpinBox::PlusMinus);
     connect(timestamp_year_, QOverload<int>::of(&QSpinBox::valueChanged), this, &main_window::on_timestamp_edit_changed);
     date_layout->addWidget(label_year);
     date_layout->addWidget(timestamp_year_);
@@ -384,6 +390,7 @@ QWidget* main_window::create_timestamp_page() {
     timestamp_month_ = new QSpinBox(page);
     timestamp_month_->setRange(1, 12);
     timestamp_month_->setValue(QDate::currentDate().month());
+    timestamp_month_->setButtonSymbols(QAbstractSpinBox::PlusMinus);
     connect(timestamp_month_, QOverload<int>::of(&QSpinBox::valueChanged), this, &main_window::on_timestamp_edit_changed);
     date_layout->addWidget(label_month);
     date_layout->addWidget(timestamp_month_);
@@ -391,6 +398,7 @@ QWidget* main_window::create_timestamp_page() {
     timestamp_day_ = new QSpinBox(page);
     timestamp_day_->setRange(1, 31);
     timestamp_day_->setValue(QDate::currentDate().day());
+    timestamp_day_->setButtonSymbols(QAbstractSpinBox::PlusMinus);
     connect(timestamp_day_, QOverload<int>::of(&QSpinBox::valueChanged), this, &main_window::on_timestamp_edit_changed);
     date_layout->addWidget(label_day);
     date_layout->addWidget(timestamp_day_);
@@ -421,13 +429,13 @@ QWidget* main_window::create_timestamp_page() {
     timestamp_second_ = new QSpinBox(page);
     timestamp_second_->setRange(0, 59);
     timestamp_second_->setValue(QTime::currentTime().second());
+    timestamp_second_->setButtonSymbols(QAbstractSpinBox::PlusMinus);
     connect(timestamp_second_, QOverload<int>::of(&QSpinBox::valueChanged), this, &main_window::on_timestamp_edit_changed);
     time_layout->addWidget(label_second);
     time_layout->addWidget(timestamp_second_);
     time_layout->addStretch();
     layout->addLayout(time_layout);
-    
-    // Update button
+
     auto *btn_update_from_editor = new QPushButton("更新时间戳", page);
     connect(btn_update_from_editor, &QPushButton::clicked, this, &main_window::on_timestamp_edit_changed);
     layout->addWidget(btn_update_from_editor);
@@ -500,7 +508,8 @@ QWidget* main_window::create_text_compare_page() {
     return page;
 }
 
-QWidget* main_window::create_gzip_page() {
+QWidget* main_window::create_gzip_page()
+{
     auto *page = create_page_container("Gzip压缩");
     auto *layout = get_content_layout(page);
 
@@ -531,7 +540,8 @@ QWidget* main_window::create_gzip_page() {
     return page;
 }
 
-QWidget* main_window::create_url_page() {
+QWidget* main_window::create_url_page()
+{
     auto *page = create_page_container("url编码/解码");
     auto *layout = get_content_layout(page);
 
@@ -565,7 +575,8 @@ QWidget* main_window::create_url_page() {
     return page;
 }
 
-QWidget* main_window::create_hash_page() {
+QWidget* main_window::create_hash_page()
+{
     auto *page = create_page_container("哈希/校验和生成器");
     auto *layout = get_content_layout(page);
 
@@ -601,11 +612,13 @@ QWidget* main_window::create_hash_page() {
     return page;
 }
 
-QWidget* main_window::create_password_page() {
+QWidget* main_window::create_password_page()
+{
     auto *page = create_page_container("密码生成器");
     auto *layout = get_content_layout(page);
 
     password_length_ = new QSpinBox(page);
+    password_length_->setButtonSymbols(QAbstractSpinBox::PlusMinus);
     password_length_->setRange(4, 128);
     password_length_->setValue(16);
     
@@ -636,31 +649,31 @@ QWidget* main_window::create_password_page() {
     connect(btn_copy, &QPushButton::clicked, this, &main_window::on_password_copy);
 
     auto *label_password_length = new QLabel("密码长度:", page);
-    layout->addWidget(label_password_length);
-    layout->addWidget(password_length_);
-    layout->addWidget(password_upper_);
-    layout->addWidget(password_lower_);
-    layout->addWidget(password_number_);
-    layout->addWidget(password_symbol_);
+    layout->addWidget(label_password_length),
+    layout->addWidget(password_length_),
+    layout->addWidget(password_upper_),
+    layout->addWidget(password_lower_),
+    layout->addWidget(password_number_),
+    layout->addWidget(password_symbol_),
     layout->addWidget(password_ambiguous_);
 
     auto *btn_layout = new QHBoxLayout();
-    btn_layout->addWidget(btn_generate);
+    btn_layout->addWidget(btn_generate),
     btn_layout->addWidget(btn_copy);
     layout->addLayout(btn_layout);
 
-    layout->addWidget(password_result_);
+    layout->addWidget(password_result_),
     layout->addWidget(password_strength_);
 
     finalize_page(page);
     return page;
 }
 
-QWidget* main_window::create_settings_page() {
+QWidget* main_window::create_settings_page()
+{
     auto *page = create_page_container("设置");
     auto *layout = get_content_layout(page);
 
-    //auto *chk_shortcuts = new QCheckBox("允许快捷键使用", page);
     auto *switch_layout = new QHBoxLayout();
     auto *lbl_view_mode = new QLabel("暗色模式", page);
     auto *btn_toggle_view_mode = new SwitchButton(page);
@@ -677,12 +690,8 @@ QWidget* main_window::create_settings_page() {
     comm_sett_labed_font.setBold(true);
     Common_setting_->setFont(comm_sett_labed_font);
     layout->addWidget(Common_setting_);
-    //layout->addWidget(chk_shortcuts);
     layout->addLayout(switch_layout);
     layout->addSpacing(20);
-
-    //auto *btn_layout = new QHBoxLayout();
-    //layout->addLayout(btn_layout);
 
     finalize_page(page);
     return page;
@@ -803,6 +812,7 @@ void main_window::show_home() const
 void main_window::toggle_view_mode()
 {
     darkmode_ = !darkmode_;set_style_();
+    common_backend::save_config(darkmode_);
 }
 
 void main_window::set_style_() const
@@ -857,10 +867,9 @@ void main_window::url_decode() const
 // ===== Color picker slots =====
 void main_window::on_color_picker_pick() const
 {
-    // For simplicity, use QColorDialog
-    QColor color = QColorDialog::getColor(Qt::black, nullptr, "选择颜色");
-    if (color.isValid() && color_picker_label_ && color_picker_combo_) {
-        QString format = color_picker_combo_->currentText();
+    if (const QColor color = QColorDialog::getColor(Qt::black, nullptr, "选择颜色"); color.isValid() && color_picker_label_ && color_picker_combo_)
+    {
+        const QString format = color_picker_combo_->currentText();
         QString result;
         
         if (format == "RGB")
@@ -898,10 +907,10 @@ void main_window::on_color_picker_pick() const
 // ===== Image resizer slots =====
 void main_window::on_image_resize() const
 {
-    QString source_path = QFileDialog::getOpenFileName(nullptr, "选择图片", QString(), "Images (*.png *.jpg *.jpeg *.bmp *.gif *.tiff)");
+    const QString source_path = QFileDialog::getOpenFileName(nullptr, "选择图片", QString(), "Images (*.png *.jpg *.jpeg *.bmp *.gif *.tiff)");
     if (source_path.isEmpty()) return;
-    
-    QString output_path = QFileDialog::getSaveFileName(nullptr, "保存图片", QString(), "PNG (*.png);;JPEG (*.jpg *.jpeg);;BMP (*.bmp)");
+
+    const QString output_path = QFileDialog::getSaveFileName(nullptr, "保存图片", QString(), "PNG (*.png);;JPEG (*.jpg *.jpeg);;BMP (*.bmp)");
     if (output_path.isEmpty()) return;
     
     image_resizer::ResizeConfig config{};
@@ -919,10 +928,10 @@ void main_window::on_image_resize() const
 
 void main_window::on_image_batch_resize() const
 {
-    QStringList source_paths = QFileDialog::getOpenFileNames(nullptr, "选择图片", QString(), "Images (*.png *.jpg *.jpeg *.bmp *.gif *.tiff)");
+    const QStringList source_paths = QFileDialog::getOpenFileNames(nullptr, "选择图片", QString(), "Images (*.png *.jpg *.jpeg *.bmp *.gif *.tiff)");
     if (source_paths.isEmpty()) return;
-    
-    QString output_dir = QFileDialog::getExistingDirectory(nullptr, "选择输出目录");
+
+    const QString output_dir = QFileDialog::getExistingDirectory(nullptr, "选择输出目录");
     if (output_dir.isEmpty()) return;
     
     image_resizer::ResizeConfig config{};
@@ -941,8 +950,7 @@ void main_window::on_image_batch_resize() const
 // ===== Rename tool slots =====
 void main_window::on_rename_select_files() const
 {
-    QStringList files = QFileDialog::getOpenFileNames(nullptr, "选择文件", QString(), "All Files (*)");
-    if (!files.isEmpty()) {
+    if (const QStringList files = QFileDialog::getOpenFileNames(nullptr, "选择文件", QString(), "All Files (*)"); !files.isEmpty()) {
         rename_selected_files_ = files;
         rename_select_btn_->setText(QString("已选择 %1 个文件").arg(files.size()));
     }
@@ -954,9 +962,10 @@ void main_window::on_rename_preview() const
         QMessageBox::warning(nullptr, "警告", "请先选择文件！");
         return;
     }
-    
-    QString pattern = rename_pattern_->text();
-    if (pattern.isEmpty()) {
+
+    const QString pattern = rename_pattern_->text();
+    if (pattern.isEmpty())
+    {
         QMessageBox::warning(nullptr, "警告", "请输入命名模式！");
         return;
     }
@@ -964,7 +973,8 @@ void main_window::on_rename_preview() const
     QList<batch_rename::RenameResult> results = batch_rename::preview_rename(rename_selected_files_, pattern);
     
     QString preview_text;
-    for (const auto &result : results) {
+    for (const auto &result : results)
+    {
         preview_text += QString("%1 -> %2 %3\n")
             .arg(result.original, result.new_name, result.success ? "✓" : "✗");
     }
@@ -978,19 +988,17 @@ void main_window::on_rename_apply() const
         QMessageBox::warning(nullptr, "警告", "请先选择文件！");
         return;
     }
-    
-    QString pattern = rename_pattern_->text();
+
+    const QString pattern = rename_pattern_->text();
     if (pattern.isEmpty()) {
         QMessageBox::warning(nullptr, "警告", "请输入命名模式！");
         return;
     }
-    
-    QList<batch_rename::RenameResult> results = batch_rename::preview_rename(rename_selected_files_, pattern);
-    
-    if (batch_rename::apply_rename(results))
+
+    if (const QList<batch_rename::RenameResult> results = batch_rename::preview_rename(rename_selected_files_, pattern); batch_rename::apply_rename(results))
         QMessageBox::information(nullptr, "成功", "重命名成功！");
     else
-        QMessageBox::warning(nullptr, "错误", "部分文件重命名失败！");
+        QMessageBox::warning(nullptr, "错误", "部分文件重命名失败！请检查文件占用等内容");
 }
 
 void main_window::on_rename_undo() const
@@ -1004,21 +1012,21 @@ void main_window::on_rename_undo() const
 // ===== Base converter slots =====
 void main_window::on_base_convert() const
 {
-    QString input = base_input_->text().trimmed();
+    const QString input = base_input_->text().trimmed();
     if (input.isEmpty()) {
         QMessageBox::warning(nullptr, "警告", "请输入数字！");
         return;
     }
-    
-    int from_base = base_from_spin_->value();
-    int to_base = base_to_spin_->value();
+
+    const int from_base = base_from_spin_->value();
+    const int to_base = base_to_spin_->value();
     
     if (!base_converter::is_valid_number(input, from_base)) {
         QMessageBox::warning(nullptr, "警告", "输入的数字与源进制不匹配！");
         return;
     }
-    
-    QString result = base_converter::convert_base(input, from_base, to_base);
+
+    const QString result = base_converter::convert_base(input, from_base, to_base);
     base_output_->setText(result);
 }
 
@@ -1030,26 +1038,26 @@ void main_window::on_timestamp_to_datetime() const
         QMessageBox::warning(nullptr, "警告", "请输入正确时间戳！");
         return;
     }
-    
-    qint64 timestamp = timestamp_str.toLongLong();
+
+    const qint64 timestamp = timestamp_str.toLongLong();
     QString timezone = timestamp_timezone_->currentText();
-    
-    QString datetime = timestamp_converter::timestamp_to_datetime(timestamp, timezone);
+
+    const QString datetime = timestamp_converter::timestamp_to_datetime(timestamp, timezone);
     timestamp_datetime_->setText(datetime);
 }
 
 void main_window::on_datetime_to_timestamp() const
 {
-    QString datetime_str = timestamp_datetime_->text().trimmed();
-    if (datetime_str.isEmpty()) {
+    const QString datetime_str = timestamp_datetime_->text().trimmed();
+    if (datetime_str.isEmpty())
+    {
         QMessageBox::warning(nullptr, "警告", "请输入日期时间！");
         return;
     }
 
     QString timezone = timestamp_timezone_->currentText();
-    qint64 timestamp = timestamp_converter::datetime_to_timestamp(datetime_str, timezone);
-    
-    if (timestamp > 0)
+
+    if (const qint64 timestamp = timestamp_converter::datetime_to_timestamp(datetime_str, timezone); timestamp > 0)
         timestamp_input_->setText(QString::number(timestamp));
     else
         QMessageBox::warning(nullptr, "错误", "无效的日期时间格式！请使用 yyyy-MM-dd hh:mm:ss");
@@ -1058,56 +1066,52 @@ void main_window::on_datetime_to_timestamp() const
 // ===== Time Editor Slots =====
 void main_window::on_timestamp_edit_changed() const
 {
-    int year = timestamp_year_->value();
-    int month = timestamp_month_->value();
-    int day = timestamp_day_->value();
-    int hour = timestamp_hour_->value();
-    int minute = timestamp_minute_->value();
-    int second = timestamp_second_->value();
+    const int year = timestamp_year_->value();
+    const int month = timestamp_month_->value();
+    const int day = timestamp_day_->value();
+    const int hour = timestamp_hour_->value();
+    const int minute = timestamp_minute_->value();
+    const int second = timestamp_second_->value();
     
     QString timezone = timestamp_timezone_->currentText();
-    qint64 timestamp = timestamp_converter::components_to_timestamp(year, month, day, hour, minute, second, timezone);
-    
-    if (timestamp > 0) {
+
+    if (const qint64 timestamp = timestamp_converter::components_to_timestamp(year, month, day, hour, minute, second, timezone); timestamp > 0)
+    {
         timestamp_input_->setText(QString::number(timestamp));
-        QString datetime = timestamp_converter::timestamp_to_datetime(timestamp, timezone);
+        const QString datetime = timestamp_converter::timestamp_to_datetime(timestamp, timezone);
         timestamp_datetime_->setText(datetime);
     }
 }
 
 void main_window::on_timestamp_add_year() const
 {
-    timestamp_year_->setValue(timestamp_year_->value() + 1);
+    timestamp_year_->setValue(timestamp_year_->value() + 1),
     on_timestamp_edit_changed();
 }
 
 void main_window::on_timestamp_sub_year() const
 {
-    timestamp_year_->setValue(timestamp_year_->value() - 1);
+    timestamp_year_->setValue(timestamp_year_->value() - 1),
     on_timestamp_edit_changed();
 }
 
 void main_window::on_timestamp_add_month() const
 {
-    int month = timestamp_month_->value();
-    if (month >= 12) {
-        timestamp_month_->setValue(1);
+    if (const int month = timestamp_month_->value(); month >= 12)
+        timestamp_month_->setValue(1),
         timestamp_year_->setValue(timestamp_year_->value() + 1);
-    } else {
+    else
         timestamp_month_->setValue(month + 1);
-    }
     on_timestamp_edit_changed();
 }
 
 void main_window::on_timestamp_sub_month() const
 {
-    int month = timestamp_month_->value();
-    if (month <= 1) {
-        timestamp_month_->setValue(12);
+    if (const int month = timestamp_month_->value(); month <= 1)
+        timestamp_month_->setValue(12),
         timestamp_year_->setValue(timestamp_year_->value() - 1);
-    } else {
+    else
         timestamp_month_->setValue(month - 1);
-    }
     on_timestamp_edit_changed();
 }
 
@@ -1119,87 +1123,77 @@ void main_window::on_timestamp_add_day() const
 
 void main_window::on_timestamp_sub_day() const
 {
-    timestamp_day_->setValue(timestamp_day_->value() - 1);
+    timestamp_day_->setValue(timestamp_day_->value() - 1),
     on_timestamp_edit_changed();
 }
 
 void main_window::on_timestamp_add_hour() const
 {
-    int hour = timestamp_hour_->value();
-    if (hour >= 23) {
-        timestamp_hour_->setValue(0);
+    if (const int hour = timestamp_hour_->value(); hour >= 23)
+        timestamp_hour_->setValue(0),
         on_timestamp_add_day();
-    } else {
-        timestamp_hour_->setValue(hour + 1);
+    else
+        timestamp_hour_->setValue(hour + 1),
         on_timestamp_edit_changed();
-    }
 }
 
 void main_window::on_timestamp_sub_hour() const
 {
-    int hour = timestamp_hour_->value();
-    if (hour <= 0) {
-        timestamp_hour_->setValue(23);
+    if (const int hour = timestamp_hour_->value(); hour <= 0)
+        timestamp_hour_->setValue(23),
         on_timestamp_sub_day();
-    } else {
-        timestamp_hour_->setValue(hour - 1);
+    else
+        timestamp_hour_->setValue(hour - 1),
         on_timestamp_edit_changed();
-    }
 }
 
 void main_window::on_timestamp_add_minute() const
 {
-    int minute = timestamp_minute_->value();
-    if (minute >= 59) {
-        timestamp_minute_->setValue(0);
+    if (const int minute = timestamp_minute_->value(); minute >= 59)
+        timestamp_minute_->setValue(0),
         on_timestamp_add_hour();
-    } else {
-        timestamp_minute_->setValue(minute + 1);
+    else
+        timestamp_minute_->setValue(minute + 1),
         on_timestamp_edit_changed();
-    }
+
 }
 
 void main_window::on_timestamp_sub_minute() const
 {
-    int minute = timestamp_minute_->value();
-    if (minute <= 0) {
-        timestamp_minute_->setValue(59);
+    if (const int minute = timestamp_minute_->value(); minute <= 0)
+        timestamp_minute_->setValue(59),
         on_timestamp_sub_hour();
-    } else {
-        timestamp_minute_->setValue(minute - 1);
+    else
+        timestamp_minute_->setValue(minute - 1),
         on_timestamp_edit_changed();
-    }
+
 }
 
 void main_window::on_timestamp_add_second() const
 {
-    int second = timestamp_second_->value();
-    if (second >= 59) {
-        timestamp_second_->setValue(0);
+    if (const int second = timestamp_second_->value(); second >= 59)
+        timestamp_second_->setValue(0),
         on_timestamp_add_minute();
-    } else {
-        timestamp_second_->setValue(second + 1);
+    else
+        timestamp_second_->setValue(second + 1),
         on_timestamp_edit_changed();
-    }
 }
 
 void main_window::on_timestamp_sub_second() const
 {
-    int second = timestamp_second_->value();
-    if (second <= 0) {
-        timestamp_second_->setValue(59);
+    if (const int second = timestamp_second_->value(); second <= 0)
+        timestamp_second_->setValue(59),
         on_timestamp_sub_minute();
-    } else {
-        timestamp_second_->setValue(second - 1);
+    else
+        timestamp_second_->setValue(second - 1),
         on_timestamp_edit_changed();
-    }
 }
 
 // ===== Text compare slots =====
 void main_window::on_text_compare() const
 {
-    QString original = text_compare_original_->toPlainText();
-    QString modified = text_compare_modified_->toPlainText();
+    const QString original = text_compare_original_->toPlainText();
+    const QString modified = text_compare_modified_->toPlainText();
     
     text_diff::DiffResult result = text_diff::compare(original, modified);
     
@@ -1208,18 +1202,18 @@ void main_window::on_text_compare() const
     QStringList lines2 = modified.split('\n');
     
     int i = 0, j = 0;
-    while (i < lines1.size() || j < lines2.size()) {
-        if (i < lines1.size() && j < lines2.size() && lines1[i] == lines2[j]) {
-            compare_result += QString("  %1\n").arg(lines1[i]);
-            i++;
+    while (i < lines1.size() || j < lines2.size())
+    {
+        if (i < lines1.size() && j < lines2.size() && lines1[i] == lines2[j])
+            compare_result += QString("  %1\n").arg(lines1[i]),
+            i++,
             j++;
-        } else if (i < lines1.size()) {
-            compare_result += QString("- %1\n").arg(lines1[i]);
+        else if (i < lines1.size())
+            compare_result += QString("- %1\n").arg(lines1[i]),
             i++;
-        } else if (j < lines2.size()) {
-            compare_result += QString("+ %1\n").arg(lines2[j]);
+        else if (j < lines2.size())
+            compare_result += QString("+ %1\n").arg(lines2[j]),
             j++;
-        }
     }
     
     text_compare_result_->setPlainText(compare_result);
@@ -1259,7 +1253,7 @@ void main_window::on_hash_generate() const
     }
     else if (!hash_selected_file_.isEmpty())
     {
-        if (algo == "MD5" || algo == "SHA256")result = hash_tool::file_md5(hash_selected_file_);
+        if (algo == "MD5" || algo == "SHA256") result = hash_tool::file_md5(hash_selected_file_);
         else QMessageBox::warning(nullptr, "警告", "文件只支持MD5和SHA256算法");
     }
     else
@@ -1273,8 +1267,8 @@ void main_window::on_hash_generate() const
 
 void main_window::on_hash_select_file() const
 {
-    QString file_path = QFileDialog::getOpenFileName(nullptr, "选择文件", QString(), "All Files (*)");
-    if (!file_path.isEmpty()) {
+    if (const QString file_path = QFileDialog::getOpenFileName(nullptr, "选择文件", QString(), "All Files (*)"); !file_path.isEmpty())
+    {
         hash_selected_file_ = file_path;
         hash_input_->setPlaceholderText(QString("文件: %1").arg(file_path));
     }
@@ -1284,29 +1278,28 @@ void main_window::on_hash_select_file() const
 void main_window::on_password_generate() const
 {
     password_gen::PasswordConfig config;
-    config.length = password_length_->value();
-    config.use_uppercase = password_upper_->isChecked();
-    config.use_lowercase = password_lower_->isChecked();
-    config.use_numbers = password_number_->isChecked();
-    config.use_symbols = password_symbol_->isChecked();
-    config.exclude_ambiguous = password_ambiguous_->isChecked();
+    config.length = password_length_->value(),
+    config.use_uppercase = password_upper_->isChecked(),
+    config.use_lowercase = password_lower_->isChecked(),
+    config.use_numbers = password_number_->isChecked(),
+    config.use_symbols = password_symbol_->isChecked(),
+    config.exclude_ambiguous = password_ambiguous_->isChecked(),
     config.custom_symbols = "";
-    
-    QString password = password_gen::generate_password(config);
-    
-    if (!password.isEmpty()) {
+
+    if (const QString password = password_gen::generate_password(config); !password.isEmpty())
+    {
         password_result_->setText(password);
-        
-        double entropy = password_gen::calculate_entropy(password);
-        QString strength = password_gen::evaluate_strength(entropy);
+
+        const double entropy = password_gen::calculate_entropy(password);
+        const QString strength = password_gen::evaluate_strength(entropy);
         password_strength_->setText(QString("密码强度: %1 (熵: %2)").arg(strength).arg(entropy, 0, 'f', 1));
     }
 }
 
 void main_window::on_password_copy() const
 {
-    QString password = password_result_->text();
-    if (!password.isEmpty()) {
+    if (const QString password = password_result_->text(); !password.isEmpty())
+    {
         QClipboard *clipboard = QApplication::clipboard();
         clipboard->setText(password);
         QMessageBox::information(nullptr, "成功", "密码已复制到剪贴板！");

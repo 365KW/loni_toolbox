@@ -143,20 +143,9 @@ namespace password_gen
     QString evaluate_strength(double entropy);
 }
 
-// 设置管理
-namespace settings
-{
-    bool load_settings();
-    void cleanup_settings();
-    bool save_settings();
-    bool get_shortcut_enabled();
-    void set_shortcut_enabled(bool enabled);
-    QString get_tool_config(const QString &tool_name);
-    void set_tool_config(const QString &tool_name, const QString &config);
-}
-
 namespace common_backend {
-    void save_config();
+    void save_config(bool darkmode);
+    bool read_config();
 }
 
 #endif //LEARNING_CPP_BACKEND_H

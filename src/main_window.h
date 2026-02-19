@@ -125,7 +125,7 @@ private:
 
     mutable QTreeWidgetItem *current_tool_item_ = nullptr;
 
-    bool darkmode_ = false;
+    bool darkmode_;
     
     // Base64 tool components
     mutable QTextEdit *base64_input_{};
