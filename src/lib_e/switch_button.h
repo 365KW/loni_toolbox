@@ -1,7 +1,3 @@
-//
-// Created by kyyou on 2026/2/18.
-//
-
 #ifndef LEARNING_CPP_SWITCH_BUTTON_H
 #define LEARNING_CPP_SWITCH_BUTTON_H
 

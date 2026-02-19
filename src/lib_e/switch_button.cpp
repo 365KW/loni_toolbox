@@ -1,12 +1,6 @@
-//
-// Created by kyyou on 2026/2/18.
-//
-
 #include "switch_button.h"
 
-
 #include <QPainter>
-#include <QDebug>
 
 SwitchButton::SwitchButton(QWidget *parent)
     : QWidget(parent)
@@ -22,7 +16,7 @@ bool SwitchButton::isChecked() const {
     return checked_;
 }
 
-void SwitchButton::setChecked(bool checked) {
+void SwitchButton::setChecked(const bool checked) {
     if (checked_ != checked) {
         checked_ = checked;
         updateSliderPosition();
@@ -31,7 +25,7 @@ void SwitchButton::setChecked(bool checked) {
     }
 }
 
-void SwitchButton::setEnabled(bool enabled) {
+void SwitchButton::setEnabled(const bool enabled) {
     enabled_ = enabled;
     setCursor(enabled_ ? Qt::PointingHandCursor : Qt::ArrowCursor);
     update();
@@ -46,7 +40,7 @@ void SwitchButton::setColors(const QColor &bgOff, const QColor &bgOn,
     update();
 }
 
-void SwitchButton::setSize(int width, int height) {
+void SwitchButton::setSize(const int width, const int height) {
     switch_width_ = width;
     switch_height_ = height;
     setFixedSize(switch_width_, switch_height_);

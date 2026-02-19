@@ -22,15 +22,20 @@
 #include <QClipboard>
 #include <QColorDialog>
 #include <QDate>
+#include <QStyleHints>
+#include <QCursor>
+#include <QMouseEvent>
 
-main_window::main_window(QWidget *parent) : QMainWindow(parent) {
-    darkmode_ = common_backend::read_config();
+main_window::main_window(QWidget *parent) : QMainWindow(parent)
+{
+    darkmode_ = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark;
     QApplication::setStyle(QStyleFactory::create("Fusion"));
     setup_ui();
     set_style_();
 }
 
-void main_window::setup_ui() {
+void main_window::setup_ui()
+{
     setWindowTitle("Loni Toolbox");
     resize(1200, 800);
 
@@ -49,12 +54,12 @@ void main_window::setup_ui() {
     setup_sidebar();
     setup_main_content();
 
-    splitter_->addWidget(sidebar_widget_);
+    splitter_->addWidget(sidebar_widget_),
     splitter_->addWidget(main_stack_);
 
-    splitter_->setCollapsible(0, false);
-    splitter_->setStretchFactor(0, 0);
-    splitter_->setStretchFactor(1, 1);
+    splitter_->setCollapsible(0, false),
+    splitter_->setStretchFactor(0, 0),
+    splitter_->setStretchFactor(1, 1),
     splitter_->setSizes({260, 940});
 }
 
@@ -67,8 +72,8 @@ void main_window::setup_sidebar() {
     sidebar_layout->setContentsMargins(12, 16, 12, 16);
 
     search_box_ = new QLineEdit(this);
-    search_box_->setObjectName("SearchBox");
-    search_box_->setPlaceholderText("搜索工具...");
+    search_box_->setObjectName("SearchBox"),
+    search_box_->setPlaceholderText("搜索工具..."),
     search_box_->setClearButtonEnabled(true);
     connect(search_box_, &QLineEdit::textChanged, this, &main_window::on_search_text_changed);
     sidebar_layout->addWidget(search_box_);
@@ -92,7 +97,7 @@ void main_window::setup_sidebar() {
     connect(settings_btn_, &QPushButton::clicked, this, &main_window::show_settings);
     sidebar_layout->addWidget(settings_btn_);
 
-    add_tool_category("系统工具", {"取色器"});
+    add_tool_category("系统工具", {"取色板"});
     add_tool_category("图像工具", {"Image Resizer"});
     add_tool_category("文件工具", {"Rename工具"});
     add_tool_category("开发工具", {"进制转换器", "时间戳转换", "Base64解密","文本比对", "GZip", "url解密", "哈希/校验和生成器", "密码生成器"});
@@ -128,22 +133,20 @@ void main_window::setup_main_content()
 {
     main_stack_ = new QStackedWidget(this);
 
-    // Add home page first
     auto *home_page = create_home_page();
     main_stack_->addWidget(home_page);
 
     create_tool_pages();
 
-    // Add settings page as last page
     auto *settings_page = create_settings_page();
     main_stack_->addWidget(settings_page);
 
-    // Show home page by default
     main_stack_->setCurrentIndex(0);
 }
 
-void main_window::create_tool_pages() {
-    QStringList all_tools = {"取色器", "Image Resizer", "Rename工具",
+void main_window::create_tool_pages()
+{
+    QStringList all_tools = {"取色板", "Image Resizer", "Rename工具",
         "进制转换器", "时间戳转换", "Base64解密", "html转义",
         "文本比对", "GZip", "url解密", "哈希/校验和生成器", "密码生成器"
     };
@@ -156,10 +159,11 @@ void main_window::create_tool_pages() {
 }
 
 // ===== 辅助函数：创建页面框架 =====
-static QWidget* create_page_container(const QString &title) {
+static QWidget* create_page_container(const QString &title)
+{
     auto *page_container = new QWidget();
     auto *page_layout = new QVBoxLayout(page_container);
-    page_layout->setSpacing(20);
+    page_layout->setSpacing(20),
     page_layout->setContentsMargins(24, 24, 24, 24);
 
     auto *title_label = new QLabel(title, page_container);
@@ -167,18 +171,18 @@ static QWidget* create_page_container(const QString &title) {
     page_layout->addWidget(title_label);
 
     auto *scroll = new QScrollArea(page_container);
-    scroll->setWidgetResizable(true);
+    scroll->setWidgetResizable(true),
     scroll->setFrameShape(QFrame::NoFrame);
 
     auto *card_widget = new QWidget();
     card_widget->setObjectName("ContentCard");
 
     auto *content_layout = new QVBoxLayout(card_widget);
-    content_layout->setSpacing(16);
+    content_layout->setSpacing(16),
     content_layout->setContentsMargins(24, 24, 24, 24);
 
-    page_container->setProperty("contentLayout", QVariant::fromValue(static_cast<void*>(content_layout)));
-    page_container->setProperty("cardWidget", QVariant::fromValue(static_cast<void*>(card_widget)));
+    page_container->setProperty("contentLayout", QVariant::fromValue(static_cast<void*>(content_layout))),
+    page_container->setProperty("cardWidget", QVariant::fromValue(static_cast<void*>(card_widget))),
     page_container->setProperty("scrollArea", QVariant::fromValue(static_cast<void*>(scroll)));
 
     return page_container;
@@ -189,7 +193,8 @@ static QVBoxLayout* get_content_layout(const QWidget *page)
     return static_cast<QVBoxLayout*>(page->property("contentLayout").value<void*>());
 }
 
-static void finalize_page(const QWidget *page) {
+static void finalize_page(const QWidget *page)
+{
     auto *content_layout = get_content_layout(page);
     content_layout->addStretch();
 
@@ -200,17 +205,16 @@ static void finalize_page(const QWidget *page) {
     auto *page_layout = qobject_cast<QVBoxLayout*>(page->layout());
     page_layout->addWidget(scroll);
 }
-
-// ===== 各工具页面创建函数 =====
-
+///<summary>Create Color picker page</summary>
 QWidget* main_window::create_color_picker_page() {
-    auto *page = create_page_container("取色器");
+    auto *page = create_page_container("取色板");
     auto *layout = get_content_layout(page);
 
-    color_picker_btn_ = new QPushButton("开始取色", page);
+    color_picker_btn_ = new QPushButton("颜色选择器", page);
     connect(color_picker_btn_, &QPushButton::clicked, this, &main_window::on_color_picker_pick);
     
     color_picker_label_ = new QLabel("当前颜色: #000000", page);
+    color_picker_label_->setMinimumHeight(50);
     color_picker_combo_ = new QComboBox(page);
     color_picker_combo_->addItems({"HEX", "RGB", "HSL", "HSV", "HWB", "NCol",
                            "CIEXYZ", "CIELAB", "Oklab", "Oklch", "VEC4", "DEC", "HEX Int"});
@@ -676,12 +680,13 @@ QWidget* main_window::create_settings_page()
 
     auto *switch_layout = new QHBoxLayout();
     auto *lbl_view_mode = new QLabel("暗色模式", page);
-    auto *btn_toggle_view_mode = new SwitchButton(page);
+    dark_mode_switch_ = new SwitchButton(page);
+    dark_mode_switch_->setChecked(darkmode_);
     switch_layout->addWidget(lbl_view_mode);
-    switch_layout->addWidget(btn_toggle_view_mode);
+    switch_layout->addWidget(dark_mode_switch_);
     switch_layout->addStretch();
 
-    connect(btn_toggle_view_mode, &SwitchButton::toggled, this, [this](bool) {
+    connect(dark_mode_switch_, &SwitchButton::toggled, this, [this](bool) {
         toggle_view_mode();
     });
 
@@ -722,7 +727,7 @@ QWidget* main_window::create_home_page() {
 
 QWidget* main_window::create_tool_page(const QString &tool_name)
 {
-    if (tool_name == "取色器")
+    if (tool_name == "取色板")
         return create_color_picker_page();
     if (tool_name == "Image Resizer")
         return create_image_resizer_page();
@@ -812,12 +817,18 @@ void main_window::show_home() const
 void main_window::toggle_view_mode()
 {
     darkmode_ = !darkmode_;set_style_();
-    common_backend::save_config(darkmode_);
 }
 
-void main_window::set_style_() const
-{
-    const QString filename = darkmode_ ? "./asset/main_dark.qss" : "./asset/main_light.qss";
+void main_window::set_style_() const {
+    QString filename;
+    if (darkmode_) {
+        filename = "./asset/main_dark.qss";
+        QGuiApplication::styleHints()->setColorScheme(Qt::ColorScheme::Dark);
+    }else {
+        filename = "./asset/main_light.qss";
+        QGuiApplication::styleHints()->setColorScheme(Qt::ColorScheme::Light);
+    }
+
     QFile qss(filename);
     QString stylesheet;
     if (qss.open(QFile::ReadOnly))
@@ -826,7 +837,6 @@ void main_window::set_style_() const
     qApp->setStyleSheet(stylesheet);
 }
 
-// ===== Base64 tool slots =====
 void main_window::on_base64_encode() const
 {
     if (base64_input_ && base64_output_)
@@ -864,47 +874,53 @@ void main_window::url_decode() const
     }
 }
 
-// ===== Color picker slots =====
 void main_window::on_color_picker_pick() const
 {
-    if (const QColor color = QColorDialog::getColor(Qt::black, nullptr, "选择颜色"); color.isValid() && color_picker_label_ && color_picker_combo_)
-    {
-        const QString format = color_picker_combo_->currentText();
-        QString result;
-        
-        if (format == "RGB")
-            result = color_picker::color_to_rgb(color);
-        else if (format == "HSL")
-            result = color_picker::color_to_hsl(color);
-        else if (format == "HSV")
-            result = color_picker::color_to_hsv(color);
-        else if (format == "HWB")
-            result = color_picker::color_to_hwb(color);
-        else if (format == "NCol")
-            result = color_picker::color_to_ncol(color);
-        else if (format == "CIEXYZ")
-            result = color_picker::color_to_ciexyz(color);
-        else if (format == "CIELAB")
-            result = color_picker::color_to_cielab(color);
-        else if (format == "Oklab")
-            result = color_picker::color_to_oklab(color);
-        else if (format == "Oklch")
-            result = color_picker::color_to_oklch(color);
-        else if (format == "VEC4")
-            result = color_picker::color_to_vec4(color);
-        else if (format == "DEC")
-            result = color_picker::color_to_dec(color);
-        else if (format == "HEX Int")
-            result = color_picker::color_to_hex_int(color);
-        else
-            result = color_picker::color_to_hex(color);
+    //TODO fix it
+    QColorDialog colorDialog(nullptr);
+    colorDialog.setCurrentColor(QColor(0, 0, 0));
+    colorDialog.setOption(QColorDialog::ShowAlphaChannel);
+    
+    if (colorDialog.exec() == QDialog::Accepted) {
+        const QColor color = colorDialog.currentColor();
+        if (color.isValid() && color_picker_label_ && color_picker_combo_)
+        {
+            const QString format = color_picker_combo_->currentText();
+            QString result;
             
-        color_picker_label_->setText("当前颜色: " + result);
-        color_picker_label_->setStyleSheet("background-color: " + color.name() + "; color: " + (color.lightness() > 128 ? "black" : "white") + "; padding: 10px;");
+            if (format == "RGB")
+                result = color_picker::color_to_rgb(color);
+            else if (format == "HSL")
+                result = color_picker::color_to_hsl(color);
+            else if (format == "HSV")
+                result = color_picker::color_to_hsv(color);
+            else if (format == "HWB")
+                result = color_picker::color_to_hwb(color);
+            else if (format == "NCol")
+                result = color_picker::color_to_ncol(color);
+            else if (format == "CIEXYZ")
+                result = color_picker::color_to_ciexyz(color);
+            else if (format == "CIELAB")
+                result = color_picker::color_to_cielab(color);
+            else if (format == "Oklab")
+                result = color_picker::color_to_oklab(color);
+            else if (format == "Oklch")
+                result = color_picker::color_to_oklch(color);
+            else if (format == "VEC4")
+                result = color_picker::color_to_vec4(color);
+            else if (format == "DEC")
+                result = color_picker::color_to_dec(color);
+            else if (format == "HEX Int")
+                result = color_picker::color_to_hex_int(color);
+            else
+                result = color_picker::color_to_hex(color);
+                
+            color_picker_label_->setText("当前颜色: " + result);
+            color_picker_label_->setStyleSheet("background-color: " + color.name() + "; color: " + (color.red() * 0.299 + color.green() * 0.587 + color.blue() * 0.114 > 186 ? "black" : "white") + "; padding: 10px;");
+        }
     }
 }
 
-// ===== Image resizer slots =====
 void main_window::on_image_resize() const
 {
     const QString source_path = QFileDialog::getOpenFileName(nullptr, "选择图片", QString(), "Images (*.png *.jpg *.jpeg *.bmp *.gif *.tiff)");

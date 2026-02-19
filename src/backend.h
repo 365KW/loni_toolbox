@@ -143,9 +143,4 @@ namespace password_gen
     QString evaluate_strength(double entropy);
 }
 
-namespace common_backend {
-    void save_config(bool darkmode);
-    bool read_config();
-}
-
 #endif //LEARNING_CPP_BACKEND_H
