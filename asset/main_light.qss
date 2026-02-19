@@ -1,0 +1,168 @@
+/* 全局基础样式 */
+QWidget {
+    font-family: "Segoe UI", "Microsoft YaHei", "sans-serif";
+    font-size: 14px;
+    color: #333333; /* 文本颜色加深 */
+}
+
+/* 主窗口 & 中央区域 */
+QMainWindow, QWidget#CentralWidget {
+    background-color: #f0f0f0; /* 浅灰背景 */
+}
+
+/* 侧边栏 */
+QWidget#SidebarWidget {
+    background-color: #f5f5f5; /* 比主背景稍亮的灰色 */
+    border-right: 1px solid #e0e0e0; /* 添加分割线 */
+}
+
+/* 搜索框 */
+QLineEdit#SearchBox {
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    padding: 6px 10px;
+    selection-background-color: #1a73e8; /* 更明亮的蓝色 */
+    color: #333333;
+}
+QLineEdit#SearchBox:focus {
+    border: 2px solid #1a73e8;
+}
+
+/* 树形控件 */
+QTreeWidget {
+    background-color: transparent;
+    border: none;
+    outline: none;
+    color: #333333;
+}
+QTreeWidget::item {
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin: 2px 8px;
+}
+QTreeWidget::item:hover {
+    background-color: #f0f0f0; /* 浅灰色悬停 */
+}
+QTreeWidget::item:selected {
+    background-color: #e3f2fd; /* 淡蓝色选中背景 */
+    color: #1a73e8; /* 蓝色选中文字 */
+    border-left: 3px solid #1a73e8;
+}
+QTreeWidget::branch {
+    background: transparent;
+}
+
+/* 内容卡片 */
+QWidget#ContentCard {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0; /* 浅灰色边框 */
+    border-radius: 8px;
+}
+
+/* 标签 */
+QLabel {
+    color: #333333;
+}
+
+/* 按钮 */
+QPushButton {
+    background-color: #f5f5f5;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    padding: 6px 16px;
+    min-height: 20px;
+    color: #333333;
+}
+QPushButton:hover {
+    background-color: #e8e8e8;
+    border-color: #bdbdbd;
+}
+QPushButton:pressed {
+    background-color: #e0e0e0;
+    border-color: #a0a0a0;
+}
+
+/* 输入控件 */
+QLineEdit, QTextEdit, QSpinBox, QComboBox {
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    padding: 5px 8px;
+    selection-background-color: #1a73e8;
+    selection-color: white;
+    color: #333333;
+}
+QLineEdit:focus, QTextEdit:focus, QSpinBox:focus, QComboBox:focus {
+    border-bottom: 2px solid #1a73e8;
+    background-color: #ffffff;
+}
+
+/* QSpinBox 上下按钮 */
+QSpinBox::up-button {
+    subcontrol-origin: border;
+    subcontrol-position: top right;
+    width: 16px;
+    height: 12px;
+    border-left: 1px solid #cccccc;
+    border-bottom: 1px solid #cccccc;
+    background-color: #f5f5f5;
+}
+QSpinBox::up-button:hover {
+    background-color: #e8e8e8;
+}
+QSpinBox::up-button:pressed {
+    background-color: #e0e0e0;
+}
+QSpinBox::up-arrow {
+    image: none;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 6px solid #333333;
+}
+QSpinBox::down-button {
+    subcontrol-origin: border;
+    subcontrol-position: bottom right;
+    width: 16px;
+    height: 12px;
+    border-left: 1px solid #cccccc;
+    background-color: #f5f5f5;
+}
+QSpinBox::down-button:hover {
+    background-color: #e8e8e8;
+}
+QSpinBox::down-button:pressed {
+    background-color: #e0e0e0;
+}
+QSpinBox::down-arrow {
+    image: none;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 6px solid #333333;
+}
+
+/* 下拉框 */
+QComboBox::drop-down {
+    background-color: #f5f5f5;
+    border-left: 1px solid #cccccc; /* 添加分割线 */
+}
+QComboBox QAbstractItemView {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    selection-background-color: #1a73e8;
+    color: #333333;
+}
+
+/* 标题 */
+QLabel#PageTitle {
+    font-size: 24px;
+    font-weight: 600;
+    color: #202124; /* 深灰色标题 */
+    margin-bottom: 10px;
+}
+
+/* 分隔器 */
+QSplitter::handle {
+    background-color: #e0e0e0;
+    width: 3px; /* 增加可见性 */
+}
