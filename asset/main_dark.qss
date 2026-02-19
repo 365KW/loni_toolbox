@@ -1,126 +1,109 @@
-        QWidget {
-            font-family: "Segoe UI", "Microsoft YaHei", "sans-serif";
-            font-size: 14px;
-            color: #e0e0e0;
-        }
-        QMainWindow, QWidget#CentralWidget {
-            background-color: #1e1e1e;
-        }
-        QWidget#SidebarWidget {
-            background-color: #1e1e1e;
-        }
-        QLineEdit#SearchBox {
-            background-color: #3c3c3c;
-            border: 1px solid #505050;
-            border-radius: 4px;
-            padding: 6px 10px;
-            selection-background-color: #0078d4;
-            color: #e0e0e0;
-        }
-        QLineEdit#SearchBox:focus {
-            border: 2px solid #0078d4;
-            border-bottom: 2px solid #0078d4;
-        }
-        QTreeWidget {
-            background-color: transparent;
-            border: none;
-            outline: none;
-            color: #e0e0e0;
-        }
-        QTreeWidget::item {
-            padding: 8px 12px;
-            border-radius: 4px;
-            margin: 2px 8px;
-        }
-        QTreeWidget::item:hover {
-            background-color: #2d2d30;
-        }
-        QTreeWidget::item:selected {
-            background-color: #3c3c3c; /* 选中项变亮 */
-            color: #0078d4;
-            border-left: 3px solid #0078d4; /* 左侧指示条 */
-        }
-        QTreeWidget::branch {
-            background: transparent;
-        }
-
-        /* 滚动区域 */
-        QScrollArea {
-            border: none;
-            background-color: transparent;
-        }
-
-        /* 内容卡片 (右侧主要区域) */
-        QWidget#ContentCard {
-            background-color: #252526;
-            border: 1px solid #3c3c3c;
-            border-radius: 8px; /* 卡片圆角 */
-        }
-
-        /* 通用控件样式 */
-        QLabel {
-            color: #e0e0e0;
-        }
-
-        /* 按钮 */
-        QPushButton {
-            background-color: #3c3c3c;
-            border: 1px solid #505050;
-            border-radius: 4px;
-            padding: 6px 16px;
-            min-height: 20px;
-            color: #e0e0e0;
-        }
-        QPushButton:hover {
-            background-color: #4c4c4c;
-            border-color: #606060;
-        }
-        QPushButton:pressed {
-            background-color: #505050;
-            border-color: #707070;
-            color: #a0a0a0;
-        }
-
-        /* 输入框 & 编辑框 */
-        QLineEdit, QTextEdit, QSpinBox, QComboBox {
-            background-color: #3c3c3c;
-            border: 1px solid #505050;
-            border-radius: 4px;
-            padding: 5px 8px;
-            selection-background-color: #0078d4;
-            selection-color: white;
-            color: #e0e0e0;
-        }
-        QLineEdit:focus, QTextEdit:focus, QSpinBox:focus, QComboBox:focus {
-            border-bottom: 2px solid #0078d4;
-            background-color: #3c3c3c;
-        }
-
-        /* 下拉框 */
-        QComboBox::drop-down {
-            subcontrol-origin: padding;
-            subcontrol-position: top right;
-            width: 20px;
-            border-left-width: 0px;
-            border-top-right-radius: 3px;
-            border-bottom-right-radius: 3px;
-        }
-        QComboBox QAbstractItemView {
-            background-color: #3c3c3c;
-            border: 1px solid #505050;
-            selection-background-color: #0078d4;
-            color: #e0e0e0;
-        }
-
-        /* 标题 */
-        QLabel#PageTitle {
-            font-size: 24px;
-            font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 10px;
-        }
-
-        /* 分隔器 */
-        QSplitter::handle {
-            background-color: transparent;
-        }
+QWidget {
+    font-family: "Segoe UI", "Microsoft YaHei", "sans-serif";
+    font-size: 14px;
+    color: #e0e0e0;
+}
+QMainWindow, QWidget#CentralWidget {
+    background-color: #1e1e1e;
+}
+QWidget#SidebarWidget {
+    background-color: #1e1e1e;
+}
+QLineEdit#SearchBox {
+    background-color: #3c3c3c;
+    border: 1px solid #505050;
+    border-radius: 4px;
+    padding: 6px 10px;
+    selection-background-color: #0078d4;
+    color: #e0e0e0;
+}
+QLineEdit#SearchBox:focus {
+    border: 2px solid #0078d4;
+    border-bottom: 2px solid #0078d4;
+}
+QTreeWidget {
+    background-color: transparent;
+    border: none;
+    outline: none;
+    color: #e0e0e0;
+}
+QTreeWidget::item {
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin: 2px 8px;
+}
+QTreeWidget::item:hover {
+    background-color: #2d2d30;
+}
+QTreeWidget::item:selected {
+    background-color: #3c3c3c;
+    color: #0078d4;
+    border-left: 3px solid #0078d4;
+}
+QTreeWidget::branch {
+    background: transparent;
+}
+QScrollArea {
+    border: none;
+    background-color: transparent;
+}
+QWidget#ContentCard {
+    background-color: #252526;
+    border: 1px solid #3c3c3c;
+    border-radius: 8px;
+}
+QLabel {
+    color: #e0e0e0;
+}
+QPushButton {
+    background-color: #3c3c3c;
+    border: 1px solid #505050;
+    border-radius: 4px;
+    padding: 6px 16px;
+    min-height: 20px;
+    color: #e0e0e0;
+}
+QPushButton:hover {
+    background-color: #4c4c4c;
+    border-color: #606060;
+}
+QPushButton:pressed {
+    background-color: #505050;
+    border-color: #707070;
+    color: #a0a0a0;
+}
+QLineEdit, QTextEdit, QSpinBox, QComboBox {
+    background-color: #3c3c3c;
+    border: 1px solid #505050;
+    border-radius: 4px;
+    padding: 5px 8px;
+    selection-background-color: #0078d4;
+    selection-color: white;
+    color: #e0e0e0;
+}
+QLineEdit:focus, QTextEdit:focus, QSpinBox:focus, QComboBox:focus {
+    border-bottom: 2px solid #0078d4;
+    background-color: #3c3c3c;
+}
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 20px;
+    border-left-width: 0px;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+QComboBox QAbstractItemView {
+    background-color: #3c3c3c;
+    border: 1px solid #505050;
+    selection-background-color: #0078d4;
+}
+QLabel#PageTitle {
+    font-size: 24px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+QSplitter::handle {
+    background-color: transparent;
+}
