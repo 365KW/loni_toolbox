@@ -103,18 +103,14 @@ namespace text_diff {
 
 // GZip
 namespace gzip_tool {
-    QByteArray compress(const QByteArray &data);
+    QByteArray x_compress(const QByteArray &data);
     QByteArray decompress(const QByteArray &data);
-    bool compress_file(const QString &source_path, const QString &output_path);
-    bool decompress_file(const QString &source_path, const QString &output_path);
 }
 
 // URL编解码
 namespace url_tool {
     QString encode(const QString &text);
     QString decode(const QString &encoded_text);
-    QString encode_component(const QString &text);
-    QString decode_component(const QString &encoded_text);
 }
 
 // 哈希/校验和生成器
@@ -123,7 +119,7 @@ namespace hash_tool {
     QString sha1(const QString &text);
     QString sha256(const QString &text);
     QString sha512(const QString &text);
-    QString crc32(const QString &text);
+    QString x_crc32(const QString &text);
     QString file_md5(const QString &file_path);
     QString file_sha256(const QString &file_path);
 }

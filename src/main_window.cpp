@@ -501,32 +501,38 @@ QWidget* main_window::create_text_compare_page() {
 }
 
 QWidget* main_window::create_gzip_page() {
-    auto *page = create_page_container("GZip");
+    auto *page = create_page_container("Gzip压缩");
     auto *layout = get_content_layout(page);
 
+    gzip_compress_input = new QTextEdit(page);
+    gzip_compress_input->setPlaceholderText("输入文本...");
+    gzip_compress_output = new QTextEdit(page);
+    gzip_compress_output->setReadOnly(true);
+    gzip_compress_output->setPlaceholderText("结果...");
     auto *btn_compress = new QPushButton("压缩", page);
-    connect(btn_compress, &QPushButton::clicked, this, &main_window::on_gzip_compress);
-    
     auto *btn_decompress = new QPushButton("解压", page);
+    connect(btn_compress, &QPushButton::clicked, this, &main_window::on_gzip_compress);
     connect(btn_decompress, &QPushButton::clicked, this, &main_window::on_gzip_decompress);
-    
-    auto *btn_compress_file = new QPushButton("压缩文件", page);
-    connect(btn_compress_file, &QPushButton::clicked, this, &main_window::on_gzip_compress_file);
-    
-    auto *btn_decompress_file = new QPushButton("解压文件", page);
-    connect(btn_decompress_file, &QPushButton::clicked, this, &main_window::on_gzip_decompress_file);
 
-    layout->addWidget(btn_compress);
-    layout->addWidget(btn_decompress);
-    layout->addWidget(btn_compress_file);
-    layout->addWidget(btn_decompress_file);
+    auto *label_input = new QLabel("输入:", page);
+    auto *label_output = new QLabel("输出:", page);
+    layout->addWidget(label_input);
+    layout->addWidget(gzip_compress_input);
+
+    auto *btn_layout = new QHBoxLayout();
+    btn_layout->addWidget(btn_compress);
+    btn_layout->addWidget(btn_decompress);
+    layout->addLayout(btn_layout);
+
+    layout->addWidget(label_output);
+    layout->addWidget(gzip_compress_output);
 
     finalize_page(page);
     return page;
 }
 
 QWidget* main_window::create_url_page() {
-    auto *page = create_page_container("url解密");
+    auto *page = create_page_container("url编码/解码");
     auto *layout = get_content_layout(page);
 
     Url_crypt_input_ = new QTextEdit(page);
@@ -538,10 +544,6 @@ QWidget* main_window::create_url_page() {
     connect(btn_encode,&QPushButton::clicked,this,&main_window::url_crypt);
     auto *btn_decode = new QPushButton("解码", page);
     connect(btn_decode,&QPushButton::clicked,this,&main_window::url_decode);
-    auto *btn_encode_comp = new QPushButton("编码组件", page);
-    connect(btn_encode_comp, &QPushButton::clicked, this, &main_window::url_encode_comp);
-    auto *btn_decode_comp = new QPushButton("解码组件", page);
-    connect(btn_decode_comp, &QPushButton::clicked, this, &main_window::url_decode_comp);
 
     auto *label_input = new QLabel("输入:", page);
     auto *label_output = new QLabel("输出:", page);
@@ -554,8 +556,6 @@ QWidget* main_window::create_url_page() {
     layout->addLayout(btn_layout1);
 
     auto *btn_layout2 = new QHBoxLayout();
-    btn_layout2->addWidget(btn_encode_comp);
-    btn_layout2->addWidget(btn_decode_comp);
     layout->addLayout(btn_layout2);
 
     layout->addWidget(label_output);
@@ -850,24 +850,6 @@ void main_window::url_decode() const
     if (Url_crypt_output_&&Url_crypt_input_)
     {
         const QString input = Url_crypt_input_->toPlainText(),res = url_tool::decode(input);
-        Url_crypt_output_->setPlainText(res);
-    }
-}
-
-void main_window::url_encode_comp() const
-{
-    if (Url_crypt_output_&&Url_crypt_input_)
-    {
-        const QString input = Url_crypt_input_->toPlainText(),res = url_tool::encode_component(input);
-        Url_crypt_output_->setPlainText(res);
-    }
-}
-
-void main_window::url_decode_comp() const
-{
-    if (Url_crypt_output_&&Url_crypt_input_)
-    {
-        const QString input = Url_crypt_input_->toPlainText(),res = url_tool::decode_component(input);
         Url_crypt_output_->setPlainText(res);
     }
 }
@@ -1246,69 +1228,42 @@ void main_window::on_text_compare() const
 // ===== GZip slots =====
 void main_window::on_gzip_compress() const
 {
-    // GZip compression for text is not directly supported in backend
-    QMessageBox::information(nullptr, "提示", "请使用文件压缩功能");
+    const QByteArray input = gzip_compress_input->toPlainText().toUtf8();
+    const QByteArray compressed = gzip_tool::x_compress(input);
+    const QString result = base64_tool::encode_bytes(compressed);  // Base64 encode
+    gzip_compress_output->setPlainText(result);
 }
 
 void main_window::on_gzip_decompress() const
 {
-    // GZip decompression for text is not directly supported in backend
-    QMessageBox::information(nullptr, "提示", "请使用文件解压功能");
-}
-
-void main_window::on_gzip_compress_file() const
-{
-    QString source_path = QFileDialog::getOpenFileName(nullptr, "选择文件", QString(), "All Files (*)");
-    if (source_path.isEmpty()) return;
-    
-    QString output_path = QFileDialog::getSaveFileName(nullptr, "保存压缩文件", QString(), "Compressed (*.gz)");
-    if (output_path.isEmpty()) return;
-    
-    if (gzip_tool::compress_file(source_path, output_path))
-        QMessageBox::information(nullptr, "成功", "文件压缩成功！");
-    else
-        QMessageBox::warning(nullptr, "错误", "文件压缩失败！");
-}
-
-void main_window::on_gzip_decompress_file() const
-{
-    QString source_path = QFileDialog::getOpenFileName(nullptr, "选择压缩文件", QString(), "Compressed (*.gz)");
-    if (source_path.isEmpty()) return;
-    
-    QString output_path = QFileDialog::getSaveFileName(nullptr, "保存解压文件", QString(), "All Files (*)");
-    if (output_path.isEmpty()) return;
-    
-    if (gzip_tool::decompress_file(source_path, output_path))
-        QMessageBox::information(nullptr, "成功", "文件解压成功！");
-    else
-        QMessageBox::warning(nullptr, "错误", "文件解压失败！");
+    const QString input = gzip_compress_input->toPlainText();
+    const QByteArray compressed = base64_tool::decode_to_bytes(input);  // Base64 decode
+    const QByteArray result = gzip_tool::decompress(compressed);
+    gzip_compress_output->setPlainText(QString::fromUtf8(result));
 }
 
 // ===== Hash tool slots =====
 void main_window::on_hash_generate() const
 {
-    const QString input = hash_input_->toPlainText();
-    const QString algo = hash_algo_combo_->currentText();
+    const QString input = hash_input_->toPlainText(),
+                  algo = hash_algo_combo_->currentText();
     QString result;
     
-    if (!input.isEmpty()) {
-        if (algo == "MD5")
-            result = hash_tool::md5(input);
-        else if (algo == "SHA1")
-            result = hash_tool::sha1(input);
-        else if (algo == "SHA256")
-            result = hash_tool::sha256(input);
-        else if (algo == "SHA512")
-            result = hash_tool::sha512(input);
-        else if (algo == "CRC32")
-            result = hash_tool::crc32(input);
-    } else if (!hash_selected_file_.isEmpty())
+    if (!input.isEmpty())
     {
-        if (algo == "MD5" || algo == "SHA256")
-            result = hash_tool::file_md5(hash_selected_file_);
-        else
-            QMessageBox::warning(nullptr, "警告", "文件只支持MD5和SHA256算法");
-    } else {
+        if (algo == "MD5")result = hash_tool::md5(input);
+        else if (algo == "SHA1")result = hash_tool::sha1(input);
+        else if (algo == "SHA256")result = hash_tool::sha256(input);
+        else if (algo == "SHA512")result = hash_tool::sha512(input);
+        else if (algo == "CRC32")result = hash_tool::x_crc32(input);
+    }
+    else if (!hash_selected_file_.isEmpty())
+    {
+        if (algo == "MD5" || algo == "SHA256")result = hash_tool::file_md5(hash_selected_file_);
+        else QMessageBox::warning(nullptr, "警告", "文件只支持MD5和SHA256算法");
+    }
+    else
+    {
         QMessageBox::warning(nullptr, "警告", "请输入文本或选择文件！");
         return;
     }

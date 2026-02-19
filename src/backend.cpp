@@ -523,7 +523,7 @@ namespace text_diff {
 
 // ==================== GZip ====================
 namespace gzip_tool {
-    QByteArray compress(const QByteArray &data) {
+    QByteArray x_compress(const QByteArray &data) {
         if (data.isEmpty()) return {};
         
         z_stream zs;
@@ -596,44 +596,6 @@ namespace gzip_tool {
         
         return outstring;
     }
-    
-    bool compress_file(const QString &source_path, const QString &output_path) {
-        QFile source(source_path);
-        if (!source.open(QIODevice::ReadOnly)) return false;
-        
-        QByteArray data = source.readAll();
-        source.close();
-        
-        QByteArray compressed = compress(data);
-        if (compressed.isEmpty() && !data.isEmpty()) return false;
-        
-        QFile output(output_path);
-        if (!output.open(QIODevice::WriteOnly)) return false;
-        
-        output.write(compressed);
-        output.close();
-        
-        return true;
-    }
-    
-    bool decompress_file(const QString &source_path, const QString &output_path) {
-        QFile source(source_path);
-        if (!source.open(QIODevice::ReadOnly)) return false;
-        
-        QByteArray data = source.readAll();
-        source.close();
-        
-        QByteArray decompressed = decompress(data);
-        if (decompressed.isEmpty() && !data.isEmpty()) return false;
-        
-        QFile output(output_path);
-        if (!output.open(QIODevice::WriteOnly)) return false;
-        
-        output.write(decompressed);
-        output.close();
-        
-        return true;
-    }
 }
 
 // ==================== URL编解码 ====================
@@ -642,18 +604,8 @@ namespace url_tool {
     {
         return QString::fromUtf8(QUrl::toPercentEncoding(text));
     }
-    
+
     QString decode(const QString &encoded_text)
-    {
-        return QUrl::fromPercentEncoding(encoded_text.toUtf8());
-    }
-    
-    QString encode_component(const QString &text)
-    {
-        return QString::fromUtf8(QUrl::toPercentEncoding(text, QByteArray(), QByteArray()));
-    }
-    
-    QString decode_component(const QString &encoded_text)
     {
         return QUrl::fromPercentEncoding(encoded_text.toUtf8());
     }
@@ -681,7 +633,7 @@ namespace hash_tool {
         return QString::fromUtf8(QCryptographicHash::hash(text.toUtf8(), QCryptographicHash::Sha512).toHex());
     }
     
-    QString crc32(const QString &text) {
+    QString x_crc32(const QString &text) {
         static quint32 crc_table[256];
         static bool table_initialized = false;
         

@@ -36,9 +36,7 @@ private slots:
     // Url crypt tool slots
     void url_crypt() const;
     void url_decode() const;
-    void url_encode_comp() const;
-    void url_decode_comp() const;
-    
+
     // Color picker slots
     void on_color_picker_pick() const;
     
@@ -78,8 +76,6 @@ private slots:
     // GZip slots
     void on_gzip_compress() const;
     void on_gzip_decompress() const;
-    void on_gzip_compress_file() const;
-    void on_gzip_decompress_file() const;
     
     // Hash tool slots
     void on_hash_generate() const;
@@ -132,12 +128,12 @@ private:
     bool darkmode_ = false;
     
     // Base64 tool components
-    QTextEdit *base64_input_{};
-    QTextEdit *base64_output_{};
+    mutable QTextEdit *base64_input_{};
+    mutable QTextEdit *base64_output_{};
     
     // Url crypt components
-    QTextEdit *Url_crypt_input_{};
-    QTextEdit *Url_crypt_output_{};
+    mutable QTextEdit *Url_crypt_input_{};
+    mutable QTextEdit *Url_crypt_output_{};
     
     // Color picker components
     mutable QPushButton *color_picker_btn_{};
@@ -188,6 +184,10 @@ private:
     mutable QComboBox *hash_algo_combo_{};
     mutable QLineEdit *hash_result_{};
     mutable QString hash_selected_file_;
+
+    // gzip compress components
+    mutable QTextEdit *gzip_compress_input{};
+    mutable QTextEdit *gzip_compress_output{};
     
     // Password generator components
     mutable QSpinBox *password_length_{};
