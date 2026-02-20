@@ -149,7 +149,7 @@ void main_window::setup_main_content()
 
 void main_window::create_tool_pages()
 {
-    QStringList all_tools = {"取色板", "Image Resizer", "Rename工具",
+    QStringList all_tools = {"取色板", "Image Resizer",
         "进制转换器", "时间戳转换", "Base64解密", "html转义",
         "文本比对", "GZip", "url解密", "哈希/校验和生成器", "密码生成器"
     };
@@ -791,7 +791,7 @@ void main_window::toggle_view_mode()
 
 void main_window::open_help_document()
 {
-    const QString helpPath = QCoreApplication::applicationDirPath() + "/help/helper.html";
+    const QString helpPath = QCoreApplication::applicationDirPath() + "./help/helper.html";
     QDesktopServices::openUrl(QUrl::fromLocalFile(helpPath));
 }
 
