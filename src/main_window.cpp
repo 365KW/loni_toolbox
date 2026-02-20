@@ -217,7 +217,7 @@ QWidget* main_window::create_color_picker_page() {
     color_picker_label_->setMinimumHeight(50);
     color_picker_combo_ = new QComboBox(page);
     color_picker_combo_->addItems({"HEX", "RGB", "HSL", "HSV", "HWB", "NCol",
-                           "CIEXYZ", "CIELAB", "Oklab", "Oklch", "VEC4", "DEC", "HEX Int"});
+                           "CIEXYZ", "CIELAB", "Oklab", "Oklch", "VEC4", "DEC", "HEX 整型"});
 
     auto *label_format = new QLabel("格式:", page);
     layout->addWidget(color_picker_btn_);
@@ -686,7 +686,8 @@ QWidget* main_window::create_settings_page()
     switch_layout->addWidget(dark_mode_switch_);
     switch_layout->addStretch();
 
-    connect(dark_mode_switch_, &SwitchButton::toggled, this, [this](bool) {
+    connect(dark_mode_switch_, &SwitchButton::toggled, this, [this](bool)
+    {
         toggle_view_mode();
     });
 
@@ -694,8 +695,8 @@ QWidget* main_window::create_settings_page()
     QFont comm_sett_labed_font = Common_setting_->font();
     comm_sett_labed_font.setBold(true);
     Common_setting_->setFont(comm_sett_labed_font);
-    layout->addWidget(Common_setting_);
-    layout->addLayout(switch_layout);
+    layout->addWidget(Common_setting_),
+    layout->addLayout(switch_layout),
     layout->addSpacing(20);
 
     finalize_page(page);
@@ -855,7 +856,6 @@ void main_window::on_base64_decode() const
     }
 }
 
-// ===== URL tool slots =====
 void main_window::url_crypt() const
 {
     if (Url_crypt_output_&&Url_crypt_input_)
@@ -876,14 +876,13 @@ void main_window::url_decode() const
 
 void main_window::on_color_picker_pick() const
 {
-    //TODO fix it
     QColorDialog colorDialog(nullptr);
-    colorDialog.setCurrentColor(QColor(0, 0, 0));
+    colorDialog.setCurrentColor(QColor(1, 1, 1));
     colorDialog.setOption(QColorDialog::ShowAlphaChannel);
+    colorDialog.setOption(QColorDialog::DontUseNativeDialog);
     
     if (colorDialog.exec() == QDialog::Accepted) {
-        const QColor color = colorDialog.currentColor();
-        if (color.isValid() && color_picker_label_ && color_picker_combo_)
+        if (const QColor color = colorDialog.selectedColor(); color.isValid() && color_picker_label_ && color_picker_combo_)
         {
             const QString format = color_picker_combo_->currentText();
             QString result;
@@ -910,7 +909,7 @@ void main_window::on_color_picker_pick() const
                 result = color_picker::color_to_vec4(color);
             else if (format == "DEC")
                 result = color_picker::color_to_dec(color);
-            else if (format == "HEX Int")
+            else if (format == "HEX 整型")
                 result = color_picker::color_to_hex_int(color);
             else
                 result = color_picker::color_to_hex(color);
@@ -1241,7 +1240,19 @@ void main_window::on_gzip_compress() const
     const QByteArray input = gzip_compress_input->toPlainText().toUtf8();
     const QByteArray compressed = gzip_tool::x_compress(input);
     const QString result = base64_tool::encode_bytes(compressed);  // Base64 encode
-    gzip_compress_output->setPlainText(result);
+    
+    const qint64 originalSize = input.size();
+    const qint64 compressedSize = compressed.size();
+    double ratio = 0.0;
+    QString ratioStr;
+    
+    if (originalSize > 0) {
+        ratio = (1.0 - static_cast<double>(compressedSize) / originalSize) * 100.0;
+        ratioStr = QString("原始大小: %1 字节 | 压缩后: %2 字节 | 压缩率: %3%")
+            .arg(originalSize).arg(compressedSize).arg(ratio, 0, 'f', 1);
+    }
+    
+    gzip_compress_output->setPlainText(result + "\n\n" + ratioStr);
 }
 
 void main_window::on_gzip_decompress() const
