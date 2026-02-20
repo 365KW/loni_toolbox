@@ -16,6 +16,8 @@
 #include <QJsonObject>
 #include <QDir>
 #include <QFile>
+#include <algorithm>
+#include <QVector>
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -371,27 +373,58 @@ namespace text_diff {
         DiffResult result;
         result.original = text1,
         result.modified = text2;
-        
-        // Simple line-by-line comparison
-        QStringList lines1 = text1.split('\n'),
-                    lines2 = text2.split('\n');
-        
-        int i = 0, j = 0;
-        while (i < lines1.size() || j < lines2.size()) {
-            if (i < lines1.size() && j < lines2.size() && lines1[i] == lines2[j])
-                i++,j++;
-            else if (i < lines1.size() && (j >= lines2.size() || !lines2.contains(lines1[i])))
-                result.diff_ranges.append(qMakePair(-i - 1, -i - 1)),i++;
-            else if (j < lines2.size() && (i >= lines1.size() || !lines1.contains(lines2[j])))
-                result.diff_ranges.append(qMakePair(j, j)),j++;
-            else {
-                if (i < lines1.size())
-                    result.diff_ranges.append(qMakePair(-i - 1, -i - 1)),i++;
-                if (j < lines2.size())
-                    result.diff_ranges.append(qMakePair(j, j)),j++;
+        // LCS-based comparison to produce minimal diffs
+        QStringList lines1 = text1.split('\n');
+        QStringList lines2 = text2.split('\n');
+
+        const int n = lines1.size();
+        const int m = lines2.size();
+
+        QVector<QVector<int>> dp(n + 1, QVector<int>(m + 1, 0));
+        for (int i = 1; i <= n; ++i) {
+            for (int j = 1; j <= m; ++j) {
+                if (lines1[i - 1] == lines2[j - 1]) dp[i][j] = dp[i - 1][j - 1] + 1;
+                else dp[i][j] = qMax(dp[i - 1][j], dp[i][j - 1]);
             }
         }
-        
+
+        // Backtrack to collect LCS matches
+        QVector<QPair<int,int>> matches;
+        int bi = n, bj = m;
+        while (bi > 0 && bj > 0) {
+            if (lines1[bi - 1] == lines2[bj - 1]) {
+                matches.append(qMakePair(bi - 1, bj - 1));
+                --bi; --bj;
+            } else if (dp[bi - 1][bj] >= dp[bi][bj - 1]) {
+                --bi;
+            } else {
+                --bj;
+            }
+        }
+
+        std::reverse(matches.begin(), matches.end());
+
+        int last_i = 0, last_j = 0;
+        for (const auto &p : matches) {
+            int mi = p.first, mj = p.second;
+            // deletions from lines1 between last_i and mi
+            for (int ii = last_i; ii < mi; ++ii)
+                result.diff_ranges.append(qMakePair(-ii - 1, -ii - 1));
+            // insertions from lines2 between last_j and mj
+            for (int jj = last_j; jj < mj; ++jj)
+                result.diff_ranges.append(qMakePair(jj, jj));
+            // advance
+            last_i = mi + 1;
+            last_j = mj + 1;
+        }
+
+        // remaining deletions
+        for (int ii = last_i; ii < n; ++ii)
+            result.diff_ranges.append(qMakePair(-ii - 1, -ii - 1));
+        // remaining insertions
+        for (int jj = last_j; jj < m; ++jj)
+            result.diff_ranges.append(qMakePair(jj, jj));
+
         return result;
     }
     

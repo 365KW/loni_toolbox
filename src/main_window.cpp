@@ -28,6 +28,9 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QCloseEvent>
+#include <algorithm>
+#include <QVector>
+#include <QPair>
 
 main_window::main_window(QWidget *parent) : QMainWindow(parent)
 {
@@ -1120,28 +1123,61 @@ void main_window::on_text_compare() const
 {
     const QString original = text_compare_original_->toPlainText(),
                   modified = text_compare_modified_->toPlainText();
-    
-    text_diff::DiffResult result = text_diff::compare(original, modified);
-    
-    QString compare_result;
-    QStringList lines1 = original.split('\n'),
-                lines2 = modified.split('\n');
-    
-    int i = 0, j = 0;
-    while (i < lines1.size() || j < lines2.size())
-    {
-        if (i < lines1.size() && j < lines2.size() && lines1[i] == lines2[j])
-            compare_result += QString("  %1\n").arg(lines1[i]),
-            i++,
-            j++;
-        else if (i < lines1.size())
-            compare_result += QString("- %1\n").arg(lines1[i]),
-            i++;
-        else if (j < lines2.size())
-            compare_result += QString("+ %1\n").arg(lines2[j]),
-            j++;
+    // Use LCS (longest common subsequence) to compute a minimal diff
+    QStringList lines1 = original.split('\n');
+    QStringList lines2 = modified.split('\n');
+
+    const int n = lines1.size();
+    const int m = lines2.size();
+
+    // dp[i][j] = length of LCS of lines1[0..i-1], lines2[0..j-1]
+    QVector<QVector<int>> dp(n + 1, QVector<int>(m + 1, 0));
+    for (int i = 1; i <= n; ++i) {
+        for (int j = 1; j <= m; ++j) {
+            if (lines1[i - 1] == lines2[j - 1]) dp[i][j] = dp[i - 1][j - 1] + 1;
+            else dp[i][j] = qMax(dp[i - 1][j], dp[i][j - 1]);
+        }
     }
-    
+
+    // Backtrack to collect matching pairs (indices of LCS), then reconstruct forward
+    QVector<QPair<int,int>> matches;
+    int bi = n, bj = m;
+    while (bi > 0 && bj > 0) {
+        if (lines1[bi - 1] == lines2[bj - 1]) {
+            matches.append(qMakePair(bi - 1, bj - 1));
+            --bi; --bj;
+        } else if (dp[bi - 1][bj] >= dp[bi][bj - 1]) {
+            --bi;
+        } else {
+            --bj;
+        }
+    }
+
+    std::reverse(matches.begin(), matches.end());
+
+    QString compare_result;
+    int last_i = 0, last_j = 0;
+    for (const auto &p : matches) {
+        int mi = p.first, mj = p.second;
+        // deletions from lines1 between last_i and mi
+        for (int ii = last_i; ii < mi; ++ii)
+            compare_result += QString("- %1\n").arg(lines1[ii]);
+        // insertions from lines2 between last_j and mj
+        for (int jj = last_j; jj < mj; ++jj)
+            compare_result += QString("+ %1\n").arg(lines2[jj]);
+        // common line (no prefix)
+        compare_result += QString("%1\n").arg(lines1[mi]);
+        last_i = mi + 1;
+        last_j = mj + 1;
+    }
+
+    // remaining deletions
+    for (int ii = last_i; ii < n; ++ii)
+        compare_result += QString("- %1\n").arg(lines1[ii]);
+    // remaining insertions
+    for (int jj = last_j; jj < m; ++jj)
+        compare_result += QString("+ %1\n").arg(lines2[jj]);
+
     text_compare_result_->setPlainText(compare_result);
 }
 

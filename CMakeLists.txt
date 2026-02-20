@@ -4,7 +4,7 @@ project(Loni_toolbox)
 include(InstallRequiredSystemLibraries)
 
 set(CPACK_PACKAGE_NAME "Loni_Toolbox")
-set(CPACK_PACKAGE_VERSION "1.0.0")
+set(CPACK_PACKAGE_VERSION "1.0.2-rc")
 set(CPACK_PACKAGE_CONTACT "Kyyous@outlook.com")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A small toolbox")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE" CACHE FILEPATH "License file")
