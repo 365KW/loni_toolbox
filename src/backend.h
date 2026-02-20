@@ -10,8 +10,6 @@
 #include <QColor>
 #include <QList>
 
-
-// 取色器
 namespace color_picker {
     QColor pick_color(int x, int y);
     QString color_to_hex(const QColor &color);
@@ -29,7 +27,6 @@ namespace color_picker {
     QString color_to_hex_int(const QColor &color);
 }
 
-// Image Resizer
 namespace image_resizer {
     enum ResizeMode { Fill, Fit, Stretch };
     enum SizeUnit { CM, Inch, Percent, Pixel };
@@ -48,30 +45,12 @@ namespace image_resizer {
                              const ResizeConfig &config, const QString &fallback_format);
 }
 
-// Rename工具
-namespace batch_rename {
-    struct RenameResult {
-        QString original;
-        QString new_name;
-        bool success;
-        QString error;
-    };
-    
-    QList<RenameResult> preview_rename(const QStringList &files, const QString &pattern);
-    QList<RenameResult> preview_replace(const QStringList &files, const QString &search, const QString &replace);
-    QList<RenameResult> preview_regex_rename(const QStringList &files, const QString &pattern, const QString &replacement);
-    bool apply_rename(const QList<RenameResult> &results);
-    bool undo_rename();
-}
-
-// 进制转换器
 namespace base_converter {
     QString convert_base(const QString &number, int from_base, int to_base);
     bool is_valid_number(const QString &number, int base);
     int get_max_base();
 }
 
-// 时间戳转换
 namespace timestamp_converter {
     QString timestamp_to_datetime(qint64 timestamp, const QString &timezone);
     qint64 datetime_to_timestamp(const QString &datetime, const QString &timezone);
@@ -80,7 +59,6 @@ namespace timestamp_converter {
     qint64 components_to_timestamp(int year, int month, int day, int hour, int minute, int second, const QString &timezone);
 }
 
-// Base64
 namespace base64_tool {
     QString encode(const QString &text);
     QString decode(const QString &base64_text);
@@ -89,7 +67,6 @@ namespace base64_tool {
     bool is_valid_base64(const QString &text);
 }
 
-// 文本比对
 namespace text_diff {
     struct DiffResult {
         QString original;
@@ -101,19 +78,16 @@ namespace text_diff {
     QString generate_diff_html(const DiffResult &result);
 }
 
-// GZip
 namespace gzip_tool {
     QByteArray x_compress(const QByteArray &data);
     QByteArray decompress(const QByteArray &data);
 }
 
-// URL编解码
 namespace url_tool {
     QString encode(const QString &text);
     QString decode(const QString &encoded_text);
 }
 
-// 哈希/校验和生成器
 namespace hash_tool {
     QString md5(const QString &text);
     QString sha1(const QString &text);
@@ -124,7 +98,6 @@ namespace hash_tool {
     QString file_sha256(const QString &file_path);
 }
 
-// 密码生成器
 namespace password_gen
 {
     struct PasswordConfig

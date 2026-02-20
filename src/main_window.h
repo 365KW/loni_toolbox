@@ -43,12 +43,6 @@ private slots:
     void on_image_resize() const;
     void on_image_batch_resize() const;
 
-    void on_rename_select_files() const;
-    void on_rename_preview() const;
-    void on_rename_apply() const;
-
-    static void on_rename_undo();
-
     void on_base_convert() const;
 
     void on_timestamp_to_datetime() const;
@@ -88,7 +82,6 @@ private:
 
     QWidget* create_color_picker_page();
     QWidget* create_image_resizer_page();
-    QWidget* create_rename_page();
     QWidget* create_base_converter_page();
     QWidget* create_timestamp_page();
     QWidget* create_base64_page();
@@ -131,14 +124,6 @@ private:
     mutable QSpinBox *image_width_spin_{};
     mutable QSpinBox *image_height_spin_{};
     mutable QComboBox *image_mode_combo_{};
-
-    mutable QPushButton *rename_select_btn_{};
-    mutable QLineEdit *rename_pattern_{};
-    mutable QPushButton *rename_preview_btn_{};
-    mutable QPushButton *rename_apply_btn_{};
-    mutable QPushButton *rename_undo_btn_{};
-    mutable QTextEdit *rename_preview_text_{};
-    mutable QStringList rename_selected_files_;
 
     mutable QSpinBox *base_from_spin_{};
     mutable QSpinBox *base_to_spin_{};

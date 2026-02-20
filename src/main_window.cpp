@@ -27,6 +27,7 @@
 #include <QMouseEvent>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QCloseEvent>
 
 main_window::main_window(QWidget *parent) : QMainWindow(parent)
 {
@@ -100,9 +101,8 @@ void main_window::setup_sidebar()
     connect(settings_btn_, &QPushButton::clicked, this, &main_window::show_settings);
     sidebar_layout->addWidget(settings_btn_);
 
-    add_tool_category("系统工具", {"取色板"}),
-    add_tool_category("图像工具", {"Image Resizer"}),
-    add_tool_category("文件工具", {"Rename工具"}),
+    add_tool_category("图像工具", {"取色板"}),
+    add_tool_category("文件工具", {"Image Resizer"}),
     add_tool_category("开发工具", {"进制转换器", "时间戳转换", "Base64解密","文本比对", "GZip", "url解密", "哈希/校验和生成器", "密码生成器"});
 
     tool_tree_->expandAll();
@@ -270,46 +270,6 @@ QWidget* main_window::create_image_resizer_page()
     layout->addWidget(image_mode_combo_),
     layout->addWidget(btn_resize),
     layout->addWidget(btn_batch);
-
-    finalize_page(page);
-    return page;
-}
-
-QWidget* main_window::create_rename_page()
-{
-    auto *page = create_page_container("Rename工具");
-    auto *layout = get_content_layout(page);
-
-    rename_select_btn_ = new QPushButton("选择文件", page);
-    connect(rename_select_btn_, &QPushButton::clicked, this, &main_window::on_rename_select_files);
-    
-    rename_pattern_ = new QLineEdit(page),
-    rename_pattern_->setPlaceholderText("命名模式 (例如: file_{num})");
-    
-    rename_preview_btn_ = new QPushButton("预览", page);
-    connect(rename_preview_btn_, &QPushButton::clicked, this, &main_window::on_rename_preview);
-    
-    rename_apply_btn_ = new QPushButton("应用", page);
-    connect(rename_apply_btn_, &QPushButton::clicked, this, &main_window::on_rename_apply);
-    
-    rename_undo_btn_ = new QPushButton("撤销", page);
-    connect(rename_undo_btn_, &QPushButton::clicked, this, &main_window::on_rename_undo);
-    
-    rename_preview_text_ = new QTextEdit(page),
-    rename_preview_text_->setReadOnly(true),
-    rename_preview_text_->setPlaceholderText("预览结果...");
-
-    auto *label_pattern = new QLabel("模式:", page);
-    layout->addWidget(rename_select_btn_),
-    layout->addWidget(label_pattern),
-    layout->addWidget(rename_pattern_),
-    layout->addWidget(rename_preview_btn_),
-    layout->addWidget(rename_preview_text_);
-
-    auto *btn_layout = new QHBoxLayout();
-    btn_layout->addWidget(rename_apply_btn_),
-    btn_layout->addWidget(rename_undo_btn_),
-    layout->addLayout(btn_layout);
 
     finalize_page(page);
     return page;
@@ -743,8 +703,6 @@ QWidget* main_window::create_tool_page(const QString &tool_name)
         return create_color_picker_page();
     if (tool_name == "Image Resizer")
         return create_image_resizer_page();
-    if (tool_name == "Rename工具")
-        return create_rename_page();
     if (tool_name == "进制转换器")
         return create_base_converter_page();
     if (tool_name == "时间戳转换")
@@ -977,66 +935,6 @@ void main_window::on_image_batch_resize() const
         QMessageBox::warning(nullptr, "错误", "部分图片调整大小失败！");
 }
 
-void main_window::on_rename_select_files() const
-{
-    if (const QStringList files = QFileDialog::getOpenFileNames(nullptr, "选择文件", QString(), "All Files (*)"); !files.isEmpty())
-        rename_selected_files_ = files,
-        rename_select_btn_->setText(QString("已选择 %1 个文件").arg(files.size()));
-}
-
-void main_window::on_rename_preview() const
-{
-    if (rename_selected_files_.isEmpty()) {
-        QMessageBox::warning(nullptr, "警告", "需要选择文件才能开始重命名");
-        return;
-    }
-
-    const QString pattern = rename_pattern_->text();
-    if (pattern.isEmpty())
-    {
-        QMessageBox::warning(nullptr, "警告", "需要填入命名模式才能开始重命名");
-        return;
-    }
-    
-    QList<batch_rename::RenameResult> results = batch_rename::preview_rename(rename_selected_files_, pattern);
-    
-    QString preview_text;
-    for (const auto &result : results)
-    {
-        preview_text += QString("%1 -> %2 %3\n")
-            .arg(result.original, result.new_name, result.success ? "✓" : "✗");
-    }
-    
-    rename_preview_text_->setPlainText(preview_text);
-}
-
-void main_window::on_rename_apply() const
-{
-    if (rename_selected_files_.isEmpty())
-    {
-        QMessageBox::warning(nullptr, "警告", "请先选择文件！");
-        return;
-    }
-
-    const QString pattern = rename_pattern_->text();
-    if (pattern.isEmpty())
-    {
-        QMessageBox::warning(nullptr, "警告", "请输入命名模式！");
-        return;
-    }
-
-    if (const QList<batch_rename::RenameResult> results = batch_rename::preview_rename(rename_selected_files_, pattern); batch_rename::apply_rename(results))
-        QMessageBox::information(nullptr, "成功", "重命名成功！");
-    else
-        QMessageBox::warning(nullptr, "错误", "部分文件重命名失败！请检查文件占用等内容");
-}
-
-void main_window::on_rename_undo() {
-    if (batch_rename::undo_rename())
-        QMessageBox::information(nullptr, "成功", "撤销成功");
-    else
-        QMessageBox::warning(nullptr, "错误", "撤销失败");
-}
 
 void main_window::on_base_convert() const
 {
