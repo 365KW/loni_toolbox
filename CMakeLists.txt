@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 4.1)
-project(learning_cpp)
+project(Loni_toolbox)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_AUTOMOC ON)
@@ -15,7 +15,7 @@ find_package(Qt6 COMPONENTS
         REQUIRED)
 
 
-add_executable(learning_cpp main.cpp
+add_executable(Loni_toolbox main.cpp
         src/main_window.h
         src/main_window.cpp
         src/backend.h
@@ -24,7 +24,7 @@ add_executable(learning_cpp main.cpp
         src/lib_e/switch_button.cpp
 )
 
-target_link_libraries(learning_cpp
+target_link_libraries(Loni_toolbox
         Qt::Core
         Qt::Gui
         Qt::Widgets

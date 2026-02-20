@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
     QTranslator q_transalor;
     main_window w;
     w.show();
-    q_transalor.load("./asset/qtbase_zh_CN.qm");
-    a.installTranslator(&q_transalor);
+    if(q_transalor.load("./asset/qtbase_zh_CN.qm"))
+		QApplication::installTranslator(&q_transalor);
     return QApplication::exec();
 }
