@@ -5,9 +5,9 @@
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
+    QTranslator q_transalor;
     main_window w;
     w.show();
-    QTranslator q_transalor;
     q_transalor.load("./asset/qtbase_zh_CN.qm");
     a.installTranslator(&q_transalor);
     return QApplication::exec();

@@ -21,8 +21,6 @@
 #include <windows.h>
 #endif
 
-
-// ==================== 取色器 ====================
 namespace color_picker {
     QColor pick_color(const int x, const int y)
     {
@@ -139,7 +137,8 @@ namespace color_picker {
         return QString("oklab(%1, %2, %3)").arg(L, 0, 'f', 3).arg(a, 0, 'f', 3).arg(b_val, 0, 'f', 3);
     }
     
-    QString color_to_oklch(const QColor &color) {
+    QString color_to_oklch(const QColor &color)
+    {
         const double r = color.redF();
         const double g = color.greenF();
         const double b = color.blueF();
@@ -163,7 +162,8 @@ namespace color_picker {
         return QString("oklch(%1, %2, %3)").arg(L, 0, 'f', 3).arg(C, 0, 'f', 3).arg(h, 0, 'f', 2);
     }
     
-    QString color_to_vec4(const QColor &color) {
+    QString color_to_vec4(const QColor &color)
+    {
         return QString("vec4(%1, %2, %3, %4)")
             .arg(color.redF(), 0, 'f', 3)
             .arg(color.greenF(), 0, 'f', 3)
@@ -171,18 +171,21 @@ namespace color_picker {
             .arg(color.alphaF(), 0, 'f', 3);
     }
     
-    QString color_to_dec(const QColor &color) {
+    QString color_to_dec(const QColor &color)
+    {
         return QString::number(color.rgb());
     }
     
-    QString color_to_hex_int(const QColor &color) {
+    QString color_to_hex_int(const QColor &color)
+    {
         return QString::number(color.rgb(), 16).toUpper();
     }
 }
 
-// ==================== Image Resizer ====================
-namespace image_resizer {
-    bool resize_image(const QString &source_path, const QString &output_path, const ResizeConfig &config) {
+namespace image_resizer
+{
+    bool resize_image(const QString &source_path, const QString &output_path, const ResizeConfig &config)
+    {
         const QImage image(source_path);
         if (image.isNull()) return false;
         
@@ -203,9 +206,11 @@ namespace image_resizer {
         return scaled.save(output_path, format.toUtf8().constData());
     }
     
-    bool batch_resize(const QStringList &source_paths, const QString &output_dir, const ResizeConfig &config) {
+    bool batch_resize(const QStringList &source_paths, const QString &output_dir, const ResizeConfig &config)
+    {
         bool allSuccess = true;
-        for (const QString &path : source_paths) {
+        for (const QString &path : source_paths)
+        {
             QString fileName = QFileInfo(path).fileName();
             if (QString output_path = output_dir + "/" + fileName; !resize_image(path, output_path, config))
                 allSuccess = false;
@@ -214,11 +219,11 @@ namespace image_resizer {
     }
     
     bool resize_with_fallback(const QString &source_path, const QString &output_path, 
-                             const ResizeConfig &config, const QString &fallback_format) {
+                             const ResizeConfig &config, const QString &fallback_format)
+    {
         if (resize_image(source_path, output_path, config))
             return true;
-        
-        // Fallback
+
         const QImage image(source_path);
         if (image.isNull()) return false;
         
@@ -231,15 +236,17 @@ namespace image_resizer {
     }
 }
 
-// ==================== Rename工具 ====================
-namespace batch_rename {
+namespace batch_rename
+{
     static QList<RenameResult> last_rename_results;
     
-    QList<RenameResult> preview_rename(const QStringList &files, const QString &pattern) {
+    QList<RenameResult> preview_rename(const QStringList &files, const QString &pattern)
+    {
         QList<RenameResult> results;
         int counter = 1;
         
-        for (const QString &file : files) {
+        for (const QString &file : files)
+        {
             QFileInfo info(file);
             QString newName = pattern;
             newName.replace("{name}", info.baseName()),
@@ -258,7 +265,8 @@ namespace batch_rename {
         return results;
     }
     
-    QList<RenameResult> preview_replace(const QStringList &files, const QString &search, const QString &replace) {
+    QList<RenameResult> preview_replace(const QStringList &files, const QString &search, const QString &replace)
+    {
         QList<RenameResult> results;
         
         for (const QString &file : files) {
@@ -267,16 +275,17 @@ namespace batch_rename {
             newName.replace(search, replace);
             
             RenameResult result;
-            result.original = file;
-            result.new_name = info.path() + "/" + newName + "." + info.suffix();
-            result.success = true;
+            result.original = file,
+            result.new_name = info.path() + "/" + newName + "." + info.suffix(),
+            result.success = true,
             results.append(result);
         }
         
         return results;
     }
     
-    QList<RenameResult> preview_regex_rename(const QStringList &files, const QString &pattern, const QString &replacement) {
+    QList<RenameResult> preview_regex_rename(const QStringList &files, const QString &pattern, const QString &replacement)
+    {
         QList<RenameResult> results;
         const QRegularExpression regex(pattern);
         
@@ -296,11 +305,13 @@ namespace batch_rename {
         return results;
     }
     
-    bool apply_rename(const QList<RenameResult> &results) {
+    bool apply_rename(const QList<RenameResult> &results)
+    {
         last_rename_results.clear();
         bool allSuccess = true;
         
-        for (const RenameResult &result : results) {
+        for (const RenameResult &result : results)
+            {
             RenameResult actual = result;
             if (QFile::exists(result.new_name))
                 actual.success = false,
@@ -316,7 +327,8 @@ namespace batch_rename {
         return allSuccess;
     }
     
-    bool undo_rename() {
+    bool undo_rename()
+    {
         if (last_rename_results.isEmpty()) return false;
         
         bool allSuccess = true;
@@ -329,13 +341,15 @@ namespace batch_rename {
     }
 }
 
-// ==================== 进制转换器 ====================
-namespace base_converter {
+namespace base_converter
+{
     static const QString DIGITS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     
-    qlonglong to_decimal(const QString &number, int base) {
+    qlonglong to_decimal(const QString &number,const int base)
+    {
         qlonglong result = 0;
-        for (const QChar &c : number) {
+        for (const QChar &c : number)
+        {
             const int digit = DIGITS.indexOf(c);
             if (digit < 0 || digit >= base) return -1;
             result = result * base + digit;
@@ -343,17 +357,18 @@ namespace base_converter {
         return result;
     }
     
-    QString from_decimal(qlonglong decimal, int base) {
+    QString from_decimal(qlonglong decimal, const int base)
+    {
         if (decimal == 0) return "0";
         QString result;
-        while (decimal > 0) {
-            result.prepend(DIGITS[decimal % base]);
+        while (decimal > 0)
+            result.prepend(DIGITS[decimal % base]),
             decimal /= base;
-        }
         return result;
     }
     
-    QString convert_base(const QString &number, const int from_base, const int to_base) {
+    QString convert_base(const QString &number, const int from_base, const int to_base)
+    {
         if (number.isEmpty() || from_base < 2 || to_base < 2) return {};
 
         const qlonglong decimal = to_decimal(number, from_base);
@@ -362,21 +377,24 @@ namespace base_converter {
         return from_decimal(decimal, to_base);
     }
     
-    bool is_valid_number(const QString &number, const int base) {
+    bool is_valid_number(const QString &number, const int base)
+    {
         if (number.isEmpty() || base < 2 || base > 60) return false;
         for (const QChar &c : number)
             if (const int digit = DIGITS.indexOf(c); digit < 0 || digit >= base) return false;
         return true;
     }
     
-    int get_max_base() {
+    int get_max_base()
+    {
         return 60;
     }
 }
 
-// ==================== 时间戳转换 ====================
-namespace timestamp_converter {
-    QString timestamp_to_datetime(const qint64 timestamp, const QString &timezone) {
+namespace timestamp_converter
+{
+    QString timestamp_to_datetime(const qint64 timestamp, const QString &timezone)
+    {
         QDateTime dt;
         if (timezone == "UTC" || timezone == "GMT")
             dt = QDateTime::fromSecsSinceEpoch(timestamp, QTimeZone::utc());
@@ -387,10 +405,10 @@ namespace timestamp_converter {
         return dt.toString("yyyy-MM-dd hh:mm:ss");
     }
 
-    qint64 datetime_to_timestamp(const QString &datetime, const QString &timezone) {
+    qint64 datetime_to_timestamp(const QString &datetime, const QString &timezone)
+    {
         QDateTime dt = QDateTime::fromString(datetime, "yyyy-MM-dd hh:mm:ss");
         if (!dt.isValid()) return 0;
-
         if (timezone == "UTC" || timezone == "GMT")
             dt.setTimeZone(QTimeZone::utc());
          else if (timezone != "Local")
@@ -398,7 +416,8 @@ namespace timestamp_converter {
         return dt.toSecsSinceEpoch();
     }
 
-    QStringList get_available_timezones() {
+    QStringList get_available_timezones()
+    {
         auto zones = QTimeZone::availableTimeZoneIds();
         QStringList result;
         result << "UTC" << "Local";
@@ -409,13 +428,13 @@ namespace timestamp_converter {
 
     qint64 get_current_timestamp() {return QDateTime::currentSecsSinceEpoch();}
     
-    qint64 components_to_timestamp(int year, int month, int day, int hour, int minute, int second, const QString &timezone) {
-        QDate date(year, month, day);
-        QTime time(hour, minute, second);
+    qint64 components_to_timestamp(const int year, const int month, const int day, const int hour, const int minute, const int second, const QString &timezone)
+    {
+        const QDate date(year, month, day);
+        const QTime time(hour, minute, second);
         
-        if (!date.isValid() || !time.isValid()) {
+        if (!date.isValid() || !time.isValid())
             return 0;
-        }
         
         QDateTime dt(date, time);
         
@@ -428,8 +447,8 @@ namespace timestamp_converter {
     }
 }
 
-// ==================== Base64 ====================
-namespace base64_tool {
+namespace base64_tool
+ {
     QString encode(const QString &text) {return QString::fromUtf8(text.toUtf8().toBase64());}
     
     QString decode(const QString &base64_text)
@@ -451,10 +470,9 @@ namespace base64_tool {
     }
 }
 
-
-// ==================== 文本比对 ====================
 namespace text_diff {
-    DiffResult compare(const QString &text1, const QString &text2) {
+    DiffResult compare(const QString &text1, const QString &text2)
+    {
         DiffResult result;
         result.original = text1,
         result.modified = text2;
@@ -466,26 +484,16 @@ namespace text_diff {
         int i = 0, j = 0;
         while (i < lines1.size() || j < lines2.size()) {
             if (i < lines1.size() && j < lines2.size() && lines1[i] == lines2[j])
-                // Lines match
-                i++,
-                j++;
-             else if (i < lines1.size() && (j >= lines2.size() || !lines2.contains(lines1[i])))
-                // Line remove
-                result.diff_ranges.append(qMakePair(-i - 1, -i - 1)),
-                i++;
-             else if (j < lines2.size() && (i >= lines1.size() || !lines1.contains(lines2[j])))
-                // Line added
-                result.diff_ranges.append(qMakePair(j, j)),
-                j++;
-             else {
-                // Both changed
+                i++,j++;
+            else if (i < lines1.size() && (j >= lines2.size() || !lines2.contains(lines1[i])))
+                result.diff_ranges.append(qMakePair(-i - 1, -i - 1)),i++;
+            else if (j < lines2.size() && (i >= lines1.size() || !lines1.contains(lines2[j])))
+                result.diff_ranges.append(qMakePair(j, j)),j++;
+            else {
                 if (i < lines1.size())
-                    result.diff_ranges.append(qMakePair(-i - 1, -i - 1)),
-                    i++;
-
+                    result.diff_ranges.append(qMakePair(-i - 1, -i - 1)),i++;
                 if (j < lines2.size())
-                    result.diff_ranges.append(qMakePair(j, j)),
-                    j++;
+                    result.diff_ranges.append(qMakePair(j, j)),j++;
             }
         }
         
@@ -519,17 +527,14 @@ namespace text_diff {
     }
 }
 
-// ==================== GZip ====================
 namespace gzip_tool {
     QByteArray x_compress(const QByteArray &data) {
         if (data.isEmpty()) return {};
         
-        z_stream zs;
-        memset(&zs, 0, sizeof(zs));
-        
-        if (deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY) != Z_OK) {
+        z_stream zs = {};
+
+        if (deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY) != Z_OK)
             return {};
-        }
         
         zs.next_in = reinterpret_cast<Bytef*>(const_cast<char*>(data.data()));
         zs.avail_in = static_cast<uInt>(data.size());
@@ -538,22 +543,21 @@ namespace gzip_tool {
         char outbuffer[32768];
         QByteArray outstring;
         
-        do {
+        do
+        {
             zs.next_out = reinterpret_cast<Bytef*>(outbuffer);
             zs.avail_out = sizeof(outbuffer);
             
             ret = deflate(&zs, Z_FINISH);
             
-            if (outstring.size() < zs.total_out) {
+            if (outstring.size() < zs.total_out)
                 outstring.append(outbuffer, static_cast<int>(zs.total_out - outstring.size()));
-            }
         } while (ret == Z_OK);
         
         deflateEnd(&zs);
         
-        if (ret != Z_STREAM_END) {
+        if (ret != Z_STREAM_END)
             return {};
-        }
         
         return outstring;
     }
@@ -561,13 +565,11 @@ namespace gzip_tool {
     QByteArray decompress(const QByteArray &data) {
         if (data.isEmpty()) return {};
         
-        z_stream zs;
-        memset(&zs, 0, sizeof(zs));
-        
-        if (inflateInit2(&zs, 15 + 16) != Z_OK) {
+        z_stream zs = {};
+
+        if (inflateInit2(&zs, 15 + 16) != Z_OK)
             return {};
-        }
-        
+
         zs.next_in = reinterpret_cast<Bytef*>(const_cast<char*>(data.data()));
         zs.avail_in = static_cast<uInt>(data.size());
         
@@ -575,28 +577,26 @@ namespace gzip_tool {
         char outbuffer[32768];
         QByteArray outstring;
         
-        do {
+        do
+        {
             zs.next_out = reinterpret_cast<Bytef*>(outbuffer);
             zs.avail_out = sizeof(outbuffer);
             
             ret = inflate(&zs, 0);
             
-            if (outstring.size() < zs.total_out) {
+            if (outstring.size() < zs.total_out)
                 outstring.append(outbuffer, static_cast<int>(zs.total_out - outstring.size()));
-            }
         } while (ret == Z_OK);
         
         inflateEnd(&zs);
         
-        if (ret != Z_STREAM_END) {
+        if (ret != Z_STREAM_END)
             return {};
-        }
         
         return outstring;
     }
 }
 
-// ==================== URL编解码 ====================
 namespace url_tool {
     QString encode(const QString &text)
     {
@@ -609,7 +609,6 @@ namespace url_tool {
     }
 }
 
-// ==================== 哈希/校验和生成器 ====================
 namespace hash_tool {
     QString md5(const QString &text)
     {
@@ -631,16 +630,17 @@ namespace hash_tool {
         return QString::fromUtf8(QCryptographicHash::hash(text.toUtf8(), QCryptographicHash::Sha512).toHex());
     }
     
-    QString x_crc32(const QString &text) {
+    QString x_crc32(const QString &text)
+    {
         static quint32 crc_table[256];
         static bool table_initialized = false;
         
         if (!table_initialized) {
-            for (int i = 0; i < 256; i++) {
+            for (int i = 0; i < 256; i++)
+            {
                 quint32 crc = i;
-                for (int j = 0; j < 8; j++) {
+                for (int j = 0; j < 8; j++)
                     crc = (crc >> 1) ^ (0xEDB88320 & -(crc & 1));
-                }
                 crc_table[i] = crc;
             }
             table_initialized = true;
@@ -680,9 +680,9 @@ namespace hash_tool {
     }
 }
 
-// ==================== 密码生成器 ====================
 namespace password_gen {
-    QString generate_password(const PasswordConfig &config) {
+    QString generate_password(const PasswordConfig &config)
+    {
         QString chars;
         if (config.use_uppercase) chars += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         if (config.use_lowercase) chars += "abcdefghijklmnopqrstuvwxyz";
@@ -696,7 +696,8 @@ namespace password_gen {
         }
         
         if (chars.isEmpty()) return {};
-        if (config.exclude_ambiguous) {
+        if (config.exclude_ambiguous)
+        {
             chars.remove('I'); chars.remove('l'); chars.remove('1');
             chars.remove('O'); chars.remove('0');
         }
@@ -712,11 +713,13 @@ namespace password_gen {
         return password;
     }
     
-    double calculate_entropy(const QString &password) {
+    double calculate_entropy(const QString &password)
+    {
         int pool_size = 0;
         bool has_upper = false, has_lower = false, has_digit = false, has_symbol = false;
         
-        for (const QChar &c : password) {
+        for (const QChar &c : password)
+        {
             if (c.isUpper()) has_upper = true;
             else if (c.isLower()) has_lower = true;
             else if (c.isDigit()) has_digit = true;
@@ -732,7 +735,8 @@ namespace password_gen {
         return password.length() * log2(pool_size);
     }
     
-    QString evaluate_strength(const double entropy) {
+    QString evaluate_strength(const double entropy)
+    {
         if (entropy < 30) return "Very Weak";
         if (entropy < 50) return "Weak";
         if (entropy < 70) return "Fair";

@@ -42,18 +42,18 @@ void main_window::setup_ui()
     resize(1200, 800);
 
     auto *central_widget = new QWidget(this);
-    central_widget->setObjectName("CentralWidget");
+    central_widget->setObjectName("CentralWidget"),
     setCentralWidget(central_widget);
 
     auto *main_layout = new QHBoxLayout(central_widget);
-    main_layout->setSpacing(0);
+    main_layout->setSpacing(0),
     main_layout->setContentsMargins(0, 0, 0, 0);
 
     splitter_ = new QSplitter(Qt::Horizontal, this);
-    splitter_->setHandleWidth(1);
+    splitter_->setHandleWidth(1),
     main_layout->addWidget(splitter_);
 
-    setup_sidebar();
+    setup_sidebar(),
     setup_main_content();
 
     splitter_->addWidget(sidebar_widget_),
@@ -65,12 +65,13 @@ void main_window::setup_ui()
     splitter_->setSizes({260, 940});
 }
 
-void main_window::setup_sidebar() {
-    sidebar_widget_ = new QWidget(this);
+void main_window::setup_sidebar()
+{
+    sidebar_widget_ = new QWidget(this),
     sidebar_widget_->setObjectName("SidebarWidget");
 
     auto *sidebar_layout = new QVBoxLayout(sidebar_widget_);
-    sidebar_layout->setSpacing(8);
+    sidebar_layout->setSpacing(8),
     sidebar_layout->setContentsMargins(12, 16, 12, 16);
 
     search_box_ = new QLineEdit(this);
@@ -85,11 +86,11 @@ void main_window::setup_sidebar() {
     connect(home_btn_, &QPushButton::clicked, this, &main_window::show_home);
     sidebar_layout->addWidget(home_btn_);
 
-    tool_tree_ = new QTreeWidget(this);
-    tool_tree_->setHeaderHidden(true);
-    tool_tree_->setIndentation(10);
-    tool_tree_->setRootIsDecorated(true);
-    tool_tree_->setAnimated(true);
+    tool_tree_ = new QTreeWidget(this),
+    tool_tree_->setHeaderHidden(true),
+    tool_tree_->setIndentation(10),
+    tool_tree_->setRootIsDecorated(true),
+    tool_tree_->setAnimated(true),
     tool_tree_->setFocusPolicy(Qt::NoFocus);
     connect(tool_tree_, &QTreeWidget::itemClicked, this, &main_window::on_tool_selected);
     sidebar_layout->addWidget(tool_tree_);
@@ -99,9 +100,9 @@ void main_window::setup_sidebar() {
     connect(settings_btn_, &QPushButton::clicked, this, &main_window::show_settings);
     sidebar_layout->addWidget(settings_btn_);
 
-    add_tool_category("系统工具", {"取色板"});
-    add_tool_category("图像工具", {"Image Resizer"});
-    add_tool_category("文件工具", {"Rename工具"});
+    add_tool_category("系统工具", {"取色板"}),
+    add_tool_category("图像工具", {"Image Resizer"}),
+    add_tool_category("文件工具", {"Rename工具"}),
     add_tool_category("开发工具", {"进制转换器", "时间戳转换", "Base64解密","文本比对", "GZip", "url解密", "哈希/校验和生成器", "密码生成器"});
 
     tool_tree_->expandAll();
@@ -113,13 +114,14 @@ void main_window::add_tool_category(const QString &category, const QStringList &
     category_item->setText(0, category);
 
     QFont font = category_item->font(0);
-    font.setBold(true);
-    category_item->setFont(0, font);
+    font.setBold(true),
+    category_item->setFont(0, font),
     category_item->setFlags(category_item->flags() & ~Qt::ItemIsSelectable);
 
-    for (const auto &tool : tools) {
+    for (const auto &tool : tools)
+    {
         auto *tool_item = new QTreeWidgetItem(category_item);
-        tool_item->setText(0, tool);
+        tool_item->setText(0, tool),
         tool_items_[tool] = tool_item;
     }
 }
@@ -141,8 +143,7 @@ void main_window::setup_main_content()
     create_tool_pages();
 
     auto *settings_page = create_settings_page();
-    main_stack_->addWidget(settings_page);
-
+    main_stack_->addWidget(settings_page),
     main_stack_->setCurrentIndex(0);
 }
 
@@ -153,7 +154,8 @@ void main_window::create_tool_pages()
         "文本比对", "GZip", "url解密", "哈希/校验和生成器", "密码生成器"
     };
 
-    for (const auto &tool : all_tools) {
+    for (const auto &tool : all_tools)
+    {
         QWidget *page = create_tool_page(tool);
         tool_pages_[tool] = page;
         main_stack_->addWidget(page);
@@ -169,7 +171,7 @@ static QWidget* create_page_container(const QString &title)
     page_layout->setContentsMargins(24, 24, 24, 24);
 
     auto *title_label = new QLabel(title, page_container);
-    title_label->setObjectName("PageTitle");
+    title_label->setObjectName("PageTitle"),
     page_layout->addWidget(title_label);
 
     auto *scroll = new QScrollArea(page_container);
@@ -207,7 +209,7 @@ static void finalize_page(const QWidget *page)
     auto *page_layout = qobject_cast<QVBoxLayout*>(page->layout());
     page_layout->addWidget(scroll);
 }
-///<summary>Create Color picker page</summary>
+
 QWidget* main_window::create_color_picker_page() {
     auto *page = create_page_container("取色板");
     auto *layout = get_content_layout(page);
@@ -215,39 +217,40 @@ QWidget* main_window::create_color_picker_page() {
     color_picker_btn_ = new QPushButton("颜色选择器", page);
     connect(color_picker_btn_, &QPushButton::clicked, this, &main_window::on_color_picker_pick);
     
-    color_picker_label_ = new QLabel("当前颜色: #000000", page);
-    color_picker_label_->setMinimumHeight(50);
-    color_picker_combo_ = new QComboBox(page);
+    color_picker_label_ = new QLabel("当前颜色: #000000", page),
+    color_picker_label_->setMinimumHeight(50),
+    color_picker_combo_ = new QComboBox(page),
     color_picker_combo_->addItems({"HEX", "RGB", "HSL", "HSV", "HWB", "NCol",
                            "CIEXYZ", "CIELAB", "Oklab", "Oklch", "VEC4", "DEC", "HEX 整型"});
 
     auto *label_format = new QLabel("格式:", page);
-    layout->addWidget(color_picker_btn_);
-    layout->addWidget(color_picker_label_);
-    layout->addWidget(label_format);
+    layout->addWidget(color_picker_btn_),
+    layout->addWidget(color_picker_label_),
+    layout->addWidget(label_format),
     layout->addWidget(color_picker_combo_);
 
     finalize_page(page);
     return page;
 }
 
-QWidget* main_window::create_image_resizer_page() {
+QWidget* main_window::create_image_resizer_page()
+{
     auto *page = create_page_container("Image Resizer");
     auto *layout = get_content_layout(page);
 
-    image_width_spin_ = new QSpinBox(page);
-    image_width_spin_->setButtonSymbols(QAbstractSpinBox::PlusMinus);
-    image_width_spin_->setSuffix(" px");
-    image_width_spin_->setRange(1, 10000);
-    image_width_spin_->setValue(800);
+    image_width_spin_ = new QSpinBox(page),
+    image_width_spin_->setButtonSymbols(QAbstractSpinBox::PlusMinus),
+    image_width_spin_->setSuffix(" px"),
+    image_width_spin_->setRange(1, 10000),
+    image_width_spin_->setValue(800),
     
-    image_height_spin_ = new QSpinBox(page);
-    image_height_spin_->setButtonSymbols(QAbstractSpinBox::PlusMinus);
-    image_height_spin_->setSuffix(" px");
-    image_height_spin_->setRange(1, 10000);
+    image_height_spin_ = new QSpinBox(page),
+    image_height_spin_->setButtonSymbols(QAbstractSpinBox::PlusMinus),
+    image_height_spin_->setSuffix(" px"),
+    image_height_spin_->setRange(1, 10000),
     image_height_spin_->setValue(600);
     
-    image_mode_combo_ = new QComboBox(page);
+    image_mode_combo_ = new QComboBox(page),
     image_mode_combo_->addItems({"填充 (Fill)", "适应 (Fit)", "拉伸 (Stretch)"});
     
     auto *btn_resize = new QPushButton("调整大小", page);
@@ -259,27 +262,28 @@ QWidget* main_window::create_image_resizer_page() {
     auto *label_width = new QLabel("宽度:", page);
     auto *label_height = new QLabel("高度:", page);
     auto *label_mode = new QLabel("模式:", page);
-    layout->addWidget(label_width);
-    layout->addWidget(image_width_spin_);
-    layout->addWidget(label_height);
-    layout->addWidget(image_height_spin_);
-    layout->addWidget(label_mode);
-    layout->addWidget(image_mode_combo_);
-    layout->addWidget(btn_resize);
+    layout->addWidget(label_width),
+    layout->addWidget(image_width_spin_),
+    layout->addWidget(label_height),
+    layout->addWidget(image_height_spin_),
+    layout->addWidget(label_mode),
+    layout->addWidget(image_mode_combo_),
+    layout->addWidget(btn_resize),
     layout->addWidget(btn_batch);
 
     finalize_page(page);
     return page;
 }
 
-QWidget* main_window::create_rename_page() {
+QWidget* main_window::create_rename_page()
+{
     auto *page = create_page_container("Rename工具");
     auto *layout = get_content_layout(page);
 
     rename_select_btn_ = new QPushButton("选择文件", page);
     connect(rename_select_btn_, &QPushButton::clicked, this, &main_window::on_rename_select_files);
     
-    rename_pattern_ = new QLineEdit(page);
+    rename_pattern_ = new QLineEdit(page),
     rename_pattern_->setPlaceholderText("命名模式 (例如: file_{num})");
     
     rename_preview_btn_ = new QPushButton("预览", page);
@@ -291,27 +295,28 @@ QWidget* main_window::create_rename_page() {
     rename_undo_btn_ = new QPushButton("撤销", page);
     connect(rename_undo_btn_, &QPushButton::clicked, this, &main_window::on_rename_undo);
     
-    rename_preview_text_ = new QTextEdit(page);
-    rename_preview_text_->setReadOnly(true);
+    rename_preview_text_ = new QTextEdit(page),
+    rename_preview_text_->setReadOnly(true),
     rename_preview_text_->setPlaceholderText("预览结果...");
 
     auto *label_pattern = new QLabel("模式:", page);
-    layout->addWidget(rename_select_btn_);
-    layout->addWidget(label_pattern);
-    layout->addWidget(rename_pattern_);
-    layout->addWidget(rename_preview_btn_);
+    layout->addWidget(rename_select_btn_),
+    layout->addWidget(label_pattern),
+    layout->addWidget(rename_pattern_),
+    layout->addWidget(rename_preview_btn_),
     layout->addWidget(rename_preview_text_);
 
     auto *btn_layout = new QHBoxLayout();
-    btn_layout->addWidget(rename_apply_btn_);
-    btn_layout->addWidget(rename_undo_btn_);
+    btn_layout->addWidget(rename_apply_btn_),
+    btn_layout->addWidget(rename_undo_btn_),
     layout->addLayout(btn_layout);
 
     finalize_page(page);
     return page;
 }
 
-QWidget* main_window::create_base_converter_page() {
+QWidget* main_window::create_base_converter_page()
+{
     auto *page = create_page_container("进制转换器");
     auto *layout = get_content_layout(page);
 
@@ -339,14 +344,14 @@ QWidget* main_window::create_base_converter_page() {
     auto *label_to_base = new QLabel("到进制:", page);
     auto *label_input = new QLabel("输入:", page);
     auto *label_result = new QLabel("结果:", page);
-    layout->addWidget(label_from_base);
-    layout->addWidget(base_from_spin_);
-    layout->addWidget(label_to_base);
-    layout->addWidget(base_to_spin_);
-    layout->addWidget(label_input);
-    layout->addWidget(base_input_);
-    layout->addWidget(btn_convert);
-    layout->addWidget(label_result);
+    layout->addWidget(label_from_base),
+    layout->addWidget(base_from_spin_),
+    layout->addWidget(label_to_base),
+    layout->addWidget(base_to_spin_),
+    layout->addWidget(label_input),
+    layout->addWidget(base_input_),
+    layout->addWidget(btn_convert),
+    layout->addWidget(label_result),
     layout->addWidget(base_output_);
 
     finalize_page(page);
@@ -358,12 +363,12 @@ QWidget* main_window::create_timestamp_page() {
     auto *layout = get_content_layout(page);
 
     timestamp_input_ = new QLineEdit(page);
-    timestamp_input_->setPlaceholderText("输入时间戳");
-    timestamp_timezone_ = new QComboBox(page);
-    timestamp_timezone_->addItems(timestamp_converter::get_available_timezones());
-    timestamp_timezone_->setCurrentText("Local");
-    timestamp_datetime_ = new QLineEdit(page);
-    timestamp_datetime_->setReadOnly(false);
+    timestamp_input_->setPlaceholderText("输入时间戳"),
+    timestamp_timezone_ = new QComboBox(page),
+    timestamp_timezone_->addItems(timestamp_converter::get_available_timezones()),
+    timestamp_timezone_->setCurrentText("Local"),
+    timestamp_datetime_ = new QLineEdit(page),
+    timestamp_datetime_->setReadOnly(false),
     timestamp_datetime_->setPlaceholderText("日期时间 (yyyy-MM-dd hh:mm:ss)");
     auto *btn_to_datetime = new QPushButton("时间戳转日期", page);
     connect(btn_to_datetime, &QPushButton::clicked, this, &main_window::on_timestamp_to_datetime);
@@ -372,43 +377,43 @@ QWidget* main_window::create_timestamp_page() {
     auto *label_timestamp = new QLabel("时间戳:", page);
     auto *label_timezone = new QLabel("时区:", page);
     auto *label_datetime = new QLabel("日期时间:", page);
-    layout->addWidget(label_timestamp);
-    layout->addWidget(timestamp_input_);
-    layout->addWidget(label_timezone);
-    layout->addWidget(timestamp_timezone_);
-    layout->addWidget(btn_to_datetime);
-    layout->addWidget(label_datetime);
-    layout->addWidget(timestamp_datetime_);
+    layout->addWidget(label_timestamp),
+    layout->addWidget(timestamp_input_),
+    layout->addWidget(label_timezone),
+    layout->addWidget(timestamp_timezone_),
+    layout->addWidget(btn_to_datetime),
+    layout->addWidget(label_datetime),
+    layout->addWidget(timestamp_datetime_),
     layout->addWidget(btn_to_timestamp);
 
     auto *label_year = new QLabel("年:", page);
     auto *label_month = new QLabel("月:", page);
     auto *label_day = new QLabel("日:", page);
     auto *date_layout = new QHBoxLayout();
-    timestamp_year_ = new QSpinBox(page);
-    timestamp_year_->setRange(1970, 2100);
-    timestamp_year_->setValue(QDate::currentDate().year());
+    timestamp_year_ = new QSpinBox(page),
+    timestamp_year_->setRange(1970, 2100),
+    timestamp_year_->setValue(QDate::currentDate().year()),
     timestamp_year_->setButtonSymbols(QAbstractSpinBox::PlusMinus);
     connect(timestamp_year_, QOverload<int>::of(&QSpinBox::valueChanged), this, &main_window::on_timestamp_edit_changed);
-    date_layout->addWidget(label_year);
-    date_layout->addWidget(timestamp_year_);
+    date_layout->addWidget(label_year),
+    date_layout->addWidget(timestamp_year_),
     date_layout->addStretch();
-    timestamp_month_ = new QSpinBox(page);
-    timestamp_month_->setRange(1, 12);
-    timestamp_month_->setValue(QDate::currentDate().month());
+    timestamp_month_ = new QSpinBox(page),
+    timestamp_month_->setRange(1, 12),
+    timestamp_month_->setValue(QDate::currentDate().month()),
     timestamp_month_->setButtonSymbols(QAbstractSpinBox::PlusMinus);
     connect(timestamp_month_, QOverload<int>::of(&QSpinBox::valueChanged), this, &main_window::on_timestamp_edit_changed);
-    date_layout->addWidget(label_month);
-    date_layout->addWidget(timestamp_month_);
+    date_layout->addWidget(label_month),
+    date_layout->addWidget(timestamp_month_),
     date_layout->addStretch();
-    timestamp_day_ = new QSpinBox(page);
-    timestamp_day_->setRange(1, 31);
-    timestamp_day_->setValue(QDate::currentDate().day());
+    timestamp_day_ = new QSpinBox(page),
+    timestamp_day_->setRange(1, 31),
+    timestamp_day_->setValue(QDate::currentDate().day()),
     timestamp_day_->setButtonSymbols(QAbstractSpinBox::PlusMinus);
     connect(timestamp_day_, QOverload<int>::of(&QSpinBox::valueChanged), this, &main_window::on_timestamp_edit_changed);
-    date_layout->addWidget(label_day);
-    date_layout->addWidget(timestamp_day_);
-    date_layout->addStretch();
+    date_layout->addWidget(label_day),
+    date_layout->addWidget(timestamp_day_),
+    date_layout->addStretch(),
     layout->addLayout(date_layout);
     
     auto *label_hour = new QLabel("时:", page);
@@ -416,30 +421,30 @@ QWidget* main_window::create_timestamp_page() {
     auto *label_second = new QLabel("秒:", page);
     auto *time_layout = new QHBoxLayout();
 
-    timestamp_hour_ = new QSpinBox(page);
-    timestamp_hour_->setRange(0, 23);
-    timestamp_hour_->setValue(QTime::currentTime().hour());
+    timestamp_hour_ = new QSpinBox(page),
+    timestamp_hour_->setRange(0, 23),
+    timestamp_hour_->setValue(QTime::currentTime().hour()),
     timestamp_hour_->setButtonSymbols(QAbstractSpinBox::PlusMinus);
     connect(timestamp_hour_, QOverload<int>::of(&QSpinBox::valueChanged), this, &main_window::on_timestamp_edit_changed);
-    time_layout->addWidget(label_hour);
-    time_layout->addWidget(timestamp_hour_);
+    time_layout->addWidget(label_hour),
+    time_layout->addWidget(timestamp_hour_),
     time_layout->addStretch();
-    timestamp_minute_ = new QSpinBox(page);
-    timestamp_minute_->setRange(0, 59);
-    timestamp_minute_->setValue(QTime::currentTime().minute());
+    timestamp_minute_ = new QSpinBox(page),
+    timestamp_minute_->setRange(0, 59),
+    timestamp_minute_->setValue(QTime::currentTime().minute()),
     timestamp_minute_->setButtonSymbols(QAbstractSpinBox::PlusMinus);
     connect(timestamp_minute_, QOverload<int>::of(&QSpinBox::valueChanged), this, &main_window::on_timestamp_edit_changed);
-    time_layout->addWidget(label_minute);
-    time_layout->addWidget(timestamp_minute_);
+    time_layout->addWidget(label_minute),
+    time_layout->addWidget(timestamp_minute_),
     time_layout->addStretch();
     timestamp_second_ = new QSpinBox(page);
-    timestamp_second_->setRange(0, 59);
-    timestamp_second_->setValue(QTime::currentTime().second());
+    timestamp_second_->setRange(0, 59),
+    timestamp_second_->setValue(QTime::currentTime().second()),
     timestamp_second_->setButtonSymbols(QAbstractSpinBox::PlusMinus);
     connect(timestamp_second_, QOverload<int>::of(&QSpinBox::valueChanged), this, &main_window::on_timestamp_edit_changed);
-    time_layout->addWidget(label_second);
-    time_layout->addWidget(timestamp_second_);
-    time_layout->addStretch();
+    time_layout->addWidget(label_second),
+    time_layout->addWidget(timestamp_second_),
+    time_layout->addStretch(),
     layout->addLayout(time_layout);
 
     auto *btn_update_from_editor = new QPushButton("更新时间戳", page);
@@ -454,10 +459,10 @@ QWidget* main_window::create_base64_page() {
     auto *page = create_page_container("Base64解密");
     auto *layout = get_content_layout(page);
 
-    base64_input_ = new QTextEdit(page);
-    base64_input_->setPlaceholderText("输入文本...");
-    base64_output_ = new QTextEdit(page);
-    base64_output_->setReadOnly(true);
+    base64_input_ = new QTextEdit(page),
+    base64_input_->setPlaceholderText("输入文本..."),
+    base64_output_ = new QTextEdit(page),
+    base64_output_->setReadOnly(true),
     base64_output_->setPlaceholderText("结果...");
     auto *btn_encode = new QPushButton("编码", page);
     auto *btn_decode = new QPushButton("解码", page);
@@ -466,15 +471,15 @@ QWidget* main_window::create_base64_page() {
 
     auto *label_input = new QLabel("输入:", page);
     auto *label_output = new QLabel("输出:", page);
-    layout->addWidget(label_input);
+    layout->addWidget(label_input),
     layout->addWidget(base64_input_);
 
     auto *btn_layout = new QHBoxLayout();
-    btn_layout->addWidget(btn_encode);
-    btn_layout->addWidget(btn_decode);
+    btn_layout->addWidget(btn_encode),
+    btn_layout->addWidget(btn_decode),
     layout->addLayout(btn_layout);
 
-    layout->addWidget(label_output);
+    layout->addWidget(label_output),
     layout->addWidget(base64_output_);
 
     finalize_page(page);
@@ -486,28 +491,28 @@ QWidget* main_window::create_text_compare_page() {
     auto *page = create_page_container("文本比对");
     auto *layout = get_content_layout(page);
 
-    text_compare_original_ = new QTextEdit(page);
+    text_compare_original_ = new QTextEdit(page),
     text_compare_original_->setPlaceholderText("原始文本...");
     
-    text_compare_modified_ = new QTextEdit(page);
+    text_compare_modified_ = new QTextEdit(page),
     text_compare_modified_->setPlaceholderText("修改后文本...");
     
     auto *btn_compare = new QPushButton("比对", page);
     connect(btn_compare, &QPushButton::clicked, this, &main_window::on_text_compare);
     
-    text_compare_result_ = new QTextEdit(page);
-    text_compare_result_->setReadOnly(true);
+    text_compare_result_ = new QTextEdit(page),
+    text_compare_result_->setReadOnly(true),
     text_compare_result_->setPlaceholderText("比对结果...");
 
     auto *label_original = new QLabel("原始文本:", page);
     auto *label_modified = new QLabel("修改后文本:", page);
     auto *label_result = new QLabel("结果:", page);
-    layout->addWidget(label_original);
-    layout->addWidget(text_compare_original_);
-    layout->addWidget(label_modified);
-    layout->addWidget(text_compare_modified_);
-    layout->addWidget(btn_compare);
-    layout->addWidget(label_result);
+    layout->addWidget(label_original),
+    layout->addWidget(text_compare_original_),
+    layout->addWidget(label_modified),
+    layout->addWidget(text_compare_modified_),
+    layout->addWidget(btn_compare),
+    layout->addWidget(label_result),
     layout->addWidget(text_compare_result_);
 
     finalize_page(page);
@@ -516,13 +521,13 @@ QWidget* main_window::create_text_compare_page() {
 
 QWidget* main_window::create_gzip_page()
 {
-    auto *page = create_page_container("Gzip压缩");
+    QWidget *page = create_page_container("Gzip压缩");
     auto *layout = get_content_layout(page);
 
-    gzip_compress_input = new QTextEdit(page);
-    gzip_compress_input->setPlaceholderText("输入文本...");
-    gzip_compress_output = new QTextEdit(page);
-    gzip_compress_output->setReadOnly(true);
+    gzip_compress_input = new QTextEdit(page),
+    gzip_compress_input->setPlaceholderText("输入文本..."),
+    gzip_compress_output = new QTextEdit(page),
+    gzip_compress_output->setReadOnly(true),
     gzip_compress_output->setPlaceholderText("结果...");
     auto *btn_compress = new QPushButton("压缩", page);
     auto *btn_decompress = new QPushButton("解压", page);
@@ -531,15 +536,15 @@ QWidget* main_window::create_gzip_page()
 
     auto *label_input = new QLabel("输入:", page);
     auto *label_output = new QLabel("输出:", page);
-    layout->addWidget(label_input);
+    layout->addWidget(label_input),
     layout->addWidget(gzip_compress_input);
 
     auto *btn_layout = new QHBoxLayout();
-    btn_layout->addWidget(btn_compress);
-    btn_layout->addWidget(btn_decompress);
+    btn_layout->addWidget(btn_compress),
+    btn_layout->addWidget(btn_decompress),
     layout->addLayout(btn_layout);
 
-    layout->addWidget(label_output);
+    layout->addWidget(label_output),
     layout->addWidget(gzip_compress_output);
 
     finalize_page(page);
@@ -551,10 +556,10 @@ QWidget* main_window::create_url_page()
     auto *page = create_page_container("url编码/解码");
     auto *layout = get_content_layout(page);
 
-    Url_crypt_input_ = new QTextEdit(page);
-    Url_crypt_input_->setPlaceholderText("输入URL...");
-    Url_crypt_output_ = new QTextEdit(page);
-    Url_crypt_output_->setReadOnly(true);
+    Url_crypt_input_ = new QTextEdit(page),
+    Url_crypt_input_->setPlaceholderText("输入URL..."),
+    Url_crypt_output_ = new QTextEdit(page),
+    Url_crypt_output_->setReadOnly(true),
     Url_crypt_output_->setPlaceholderText("结果...");
     auto *btn_encode = new QPushButton("编码", page);
     connect(btn_encode,&QPushButton::clicked,this,&main_window::url_crypt);
@@ -563,18 +568,18 @@ QWidget* main_window::create_url_page()
 
     auto *label_input = new QLabel("输入:", page);
     auto *label_output = new QLabel("输出:", page);
-    layout->addWidget(label_input);
+    layout->addWidget(label_input),
     layout->addWidget(Url_crypt_input_);
 
     auto *btn_layout1 = new QHBoxLayout();
-    btn_layout1->addWidget(btn_encode);
-    btn_layout1->addWidget(btn_decode);
+    btn_layout1->addWidget(btn_encode),
+    btn_layout1->addWidget(btn_decode),
     layout->addLayout(btn_layout1);
 
     auto *btn_layout2 = new QHBoxLayout();
     layout->addLayout(btn_layout2);
 
-    layout->addWidget(label_output);
+    layout->addWidget(label_output),
     layout->addWidget(Url_crypt_output_);
 
     finalize_page(page);
@@ -592,11 +597,11 @@ QWidget* main_window::create_hash_page()
     hash_file_btn_ = new QPushButton("选择文件", page);
     connect(hash_file_btn_, &QPushButton::clicked, this, &main_window::on_hash_select_file);
     
-    hash_algo_combo_ = new QComboBox(page);
+    hash_algo_combo_ = new QComboBox(page),
     hash_algo_combo_->addItems({"MD5", "SHA1", "SHA256", "SHA512", "CRC32"});
     
-    hash_result_ = new QLineEdit(page);
-    hash_result_->setReadOnly(true);
+    hash_result_ = new QLineEdit(page),
+    hash_result_->setReadOnly(true),
     hash_result_->setPlaceholderText("哈希值...");
     
     auto *btn_generate = new QPushButton("生成", page);
@@ -605,13 +610,13 @@ QWidget* main_window::create_hash_page()
     auto *label_input = new QLabel("输入文本:", page);
     auto *label_algo = new QLabel("算法:", page);
     auto *label_result = new QLabel("结果:", page);
-    layout->addWidget(label_input);
-    layout->addWidget(hash_input_);
-    layout->addWidget(hash_file_btn_);
-    layout->addWidget(label_algo);
-    layout->addWidget(hash_algo_combo_);
-    layout->addWidget(btn_generate);
-    layout->addWidget(label_result);
+    layout->addWidget(label_input),
+    layout->addWidget(hash_input_),
+    layout->addWidget(hash_file_btn_),
+    layout->addWidget(label_algo),
+    layout->addWidget(hash_algo_combo_),
+    layout->addWidget(btn_generate),
+    layout->addWidget(label_result),
     layout->addWidget(hash_result_);
 
     finalize_page(page);
@@ -623,27 +628,27 @@ QWidget* main_window::create_password_page()
     auto *page = create_page_container("密码生成器");
     auto *layout = get_content_layout(page);
 
-    password_length_ = new QSpinBox(page);
-    password_length_->setButtonSymbols(QAbstractSpinBox::PlusMinus);
-    password_length_->setRange(4, 128);
+    password_length_ = new QSpinBox(page),
+    password_length_->setButtonSymbols(QAbstractSpinBox::PlusMinus),
+    password_length_->setRange(4, 128),
     password_length_->setValue(16);
     
-    password_upper_ = new QCheckBox("包含大写字母 (A-Z)", page);
+    password_upper_ = new QCheckBox("包含大写字母 (A-Z)", page),
     password_upper_->setChecked(true);
     
-    password_lower_ = new QCheckBox("包含小写字母 (a-z)", page);
+    password_lower_ = new QCheckBox("包含小写字母 (a-z)", page),
     password_lower_->setChecked(true);
     
-    password_number_ = new QCheckBox("包含数字 (0-9)", page);
+    password_number_ = new QCheckBox("包含数字 (0-9)", page),
     password_number_->setChecked(true);
     
-    password_symbol_ = new QCheckBox("包含符号", page);
+    password_symbol_ = new QCheckBox("包含符号", page),
     password_symbol_->setChecked(true);
     
     password_ambiguous_ = new QCheckBox("排除易混淆字符", page);
     
-    password_result_ = new QLineEdit(page);
-    password_result_->setReadOnly(true);
+    password_result_ = new QLineEdit(page),
+    password_result_->setReadOnly(true),
     password_result_->setPlaceholderText("生成的密码...");
     
     password_strength_ = new QLabel("密码强度: ", page);
@@ -682,10 +687,10 @@ QWidget* main_window::create_settings_page()
 
     auto *switch_layout = new QHBoxLayout();
     auto *lbl_view_mode = new QLabel("暗色模式", page);
-    dark_mode_switch_ = new SwitchButton(page);
-    dark_mode_switch_->setChecked(darkmode_);
-    switch_layout->addWidget(lbl_view_mode);
-    switch_layout->addWidget(dark_mode_switch_);
+    dark_mode_switch_ = new SwitchButton(page),
+    dark_mode_switch_->setChecked(darkmode_),
+    switch_layout->addWidget(lbl_view_mode),
+    switch_layout->addWidget(dark_mode_switch_),
     switch_layout->addStretch();
 
     connect(dark_mode_switch_, &SwitchButton::toggled, this, [this](bool)
@@ -699,8 +704,8 @@ QWidget* main_window::create_settings_page()
 
     auto *Common_setting_ = new QLabel("通用设置", page);
     QFont comm_sett_labed_font = Common_setting_->font();
-    comm_sett_labed_font.setBold(true);
-    Common_setting_->setFont(comm_sett_labed_font);
+    comm_sett_labed_font.setBold(true),
+    Common_setting_->setFont(comm_sett_labed_font),
     layout->addWidget(Common_setting_),
     layout->addLayout(switch_layout),
     layout->addSpacing(20);
@@ -715,17 +720,17 @@ QWidget* main_window::create_home_page() {
 
     auto *lbl_welcome = new QLabel("欢迎使用 Loni Toolbox", page);
     QFont font = lbl_welcome->font();
-    font.setPointSize(16);
-    font.setBold(true);
-    lbl_welcome->setFont(font);
+    font.setPointSize(16),
+    font.setBold(true),
+    lbl_welcome->setFont(font),
     lbl_welcome->setAlignment(Qt::AlignCenter);
 
     auto *lbl_desc = new QLabel("请从左侧菜单选择工具", page);
     lbl_desc->setAlignment(Qt::AlignCenter);
 
-    layout->addStretch();
-    layout->addWidget(lbl_welcome);
-    layout->addWidget(lbl_desc);
+    layout->addStretch(),
+    layout->addWidget(lbl_welcome),
+    layout->addWidget(lbl_desc),
     layout->addStretch();
 
     finalize_page(page);
@@ -783,7 +788,7 @@ void main_window::on_tool_selected(const QTreeWidgetItem *item)
 
 void main_window::on_search_text_changed(const QString &text)
 {
-    for (auto it = tool_items_.begin(); it != tool_items_.end(); ++it)
+    for (QMap<QString, QTreeWidgetItem *>::iterator it = tool_items_.begin(); it != tool_items_.end(); ++it)
     {
         const bool match = text.isEmpty() || it.key().contains(text, Qt::CaseInsensitive);
         it.value()->setHidden(!match);
@@ -793,7 +798,7 @@ void main_window::on_search_text_changed(const QString &text)
 
     for (int i = 0; i < tool_tree_->topLevelItemCount(); ++i)
     {
-        auto *category = tool_tree_->topLevelItem(i);
+        QTreeWidgetItem *category = tool_tree_->topLevelItem(i);
         bool has_visible = false;
         for (int j = 0; j < category->childCount(); ++j)
             if (!category->child(j)->isHidden())
@@ -826,20 +831,20 @@ void main_window::toggle_view_mode()
     darkmode_ = !darkmode_;set_style_();
 }
 
-void main_window::open_help_document() {
+void main_window::open_help_document()
+{
     const QString helpPath = QCoreApplication::applicationDirPath() + "/help/helper.html";
     QDesktopServices::openUrl(QUrl::fromLocalFile(helpPath));
 }
 
 void main_window::set_style_() const {
     QString filename;
-    if (darkmode_) {
-        filename = "./asset/main_dark.qss";
+    if (darkmode_)
+        filename = "./asset/main_dark.qss",
         QGuiApplication::styleHints()->setColorScheme(Qt::ColorScheme::Dark);
-    }else {
-        filename = "./asset/main_light.qss";
+    else
+        filename = "./asset/main_light.qss",
         QGuiApplication::styleHints()->setColorScheme(Qt::ColorScheme::Light);
-    }
 
     QFile qss(filename);
     QString stylesheet;
@@ -888,16 +893,16 @@ void main_window::url_decode() const
 void main_window::on_color_picker_pick() const
 {
     QColorDialog colorDialog(nullptr);
-    colorDialog.setCurrentColor(QColor(1, 1, 1));
-    colorDialog.setOption(QColorDialog::ShowAlphaChannel);
+    colorDialog.setCurrentColor(QColor(1, 1, 1)),
+    colorDialog.setOption(QColorDialog::ShowAlphaChannel),
     colorDialog.setOption(QColorDialog::DontUseNativeDialog);
     
-    if (colorDialog.exec() == QDialog::Accepted) {
+    if (colorDialog.exec() == QDialog::Accepted)
+    {
         if (const QColor color = colorDialog.selectedColor(); color.isValid() && color_picker_label_ && color_picker_combo_)
         {
             const QString format = color_picker_combo_->currentText();
             QString result;
-            
             if (format == "RGB")
                 result = color_picker::color_to_rgb(color);
             else if (format == "HSL")
@@ -924,8 +929,7 @@ void main_window::on_color_picker_pick() const
                 result = color_picker::color_to_hex_int(color);
             else
                 result = color_picker::color_to_hex(color);
-                
-            color_picker_label_->setText("当前颜色: " + result);
+            color_picker_label_->setText("当前颜色: " + result),
             color_picker_label_->setStyleSheet("background-color: " + color.name() + "; color: " + (color.red() * 0.299 + color.green() * 0.587 + color.blue() * 0.114 > 186 ? "black" : "white") + "; padding: 10px;");
         }
     }
@@ -940,10 +944,10 @@ void main_window::on_image_resize() const
     if (output_path.isEmpty()) return;
     
     image_resizer::ResizeConfig config{};
-    config.width = image_width_spin_->value();
-    config.height = image_height_spin_->value();
-    config.mode = static_cast<image_resizer::ResizeMode>(image_mode_combo_->currentIndex());
-    config.unit = image_resizer::Pixel;
+    config.width = image_width_spin_->value(),
+    config.height = image_height_spin_->value(),
+    config.mode = static_cast<image_resizer::ResizeMode>(image_mode_combo_->currentIndex()),
+    config.unit = image_resizer::Pixel,
     config.keep_aspect = true;
     
     if (image_resizer::resize_image(source_path, output_path, config))
@@ -961,10 +965,10 @@ void main_window::on_image_batch_resize() const
     if (output_dir.isEmpty()) return;
     
     image_resizer::ResizeConfig config{};
-    config.width = image_width_spin_->value();
-    config.height = image_height_spin_->value();
-    config.mode = static_cast<image_resizer::ResizeMode>(image_mode_combo_->currentIndex());
-    config.unit = image_resizer::Pixel;
+    config.width = image_width_spin_->value(),
+    config.height = image_height_spin_->value(),
+    config.mode = static_cast<image_resizer::ResizeMode>(image_mode_combo_->currentIndex()),
+    config.unit = image_resizer::Pixel,
     config.keep_aspect = true;
     
     if (image_resizer::batch_resize(source_paths, output_dir, config))
@@ -973,26 +977,24 @@ void main_window::on_image_batch_resize() const
         QMessageBox::warning(nullptr, "错误", "部分图片调整大小失败！");
 }
 
-// ===== Rename tool slots =====
 void main_window::on_rename_select_files() const
 {
-    if (const QStringList files = QFileDialog::getOpenFileNames(nullptr, "选择文件", QString(), "All Files (*)"); !files.isEmpty()) {
-        rename_selected_files_ = files;
+    if (const QStringList files = QFileDialog::getOpenFileNames(nullptr, "选择文件", QString(), "All Files (*)"); !files.isEmpty())
+        rename_selected_files_ = files,
         rename_select_btn_->setText(QString("已选择 %1 个文件").arg(files.size()));
-    }
 }
 
 void main_window::on_rename_preview() const
 {
     if (rename_selected_files_.isEmpty()) {
-        QMessageBox::warning(nullptr, "警告", "请先选择文件！");
+        QMessageBox::warning(nullptr, "警告", "需要选择文件才能开始重命名");
         return;
     }
 
     const QString pattern = rename_pattern_->text();
     if (pattern.isEmpty())
     {
-        QMessageBox::warning(nullptr, "警告", "请输入命名模式！");
+        QMessageBox::warning(nullptr, "警告", "需要填入命名模式才能开始重命名");
         return;
     }
     
@@ -1010,13 +1012,15 @@ void main_window::on_rename_preview() const
 
 void main_window::on_rename_apply() const
 {
-    if (rename_selected_files_.isEmpty()) {
+    if (rename_selected_files_.isEmpty())
+    {
         QMessageBox::warning(nullptr, "警告", "请先选择文件！");
         return;
     }
 
     const QString pattern = rename_pattern_->text();
-    if (pattern.isEmpty()) {
+    if (pattern.isEmpty())
+    {
         QMessageBox::warning(nullptr, "警告", "请输入命名模式！");
         return;
     }
@@ -1027,27 +1031,27 @@ void main_window::on_rename_apply() const
         QMessageBox::warning(nullptr, "错误", "部分文件重命名失败！请检查文件占用等内容");
 }
 
-void main_window::on_rename_undo() const
-{
+void main_window::on_rename_undo() {
     if (batch_rename::undo_rename())
-        QMessageBox::information(nullptr, "成功", "撤销成功！");
+        QMessageBox::information(nullptr, "成功", "撤销成功");
     else
-        QMessageBox::warning(nullptr, "错误", "撤销失败！");
+        QMessageBox::warning(nullptr, "错误", "撤销失败");
 }
 
-// ===== Base converter slots =====
 void main_window::on_base_convert() const
 {
     const QString input = base_input_->text().trimmed();
-    if (input.isEmpty()) {
+    if (input.isEmpty())
+    {
         QMessageBox::warning(nullptr, "警告", "请输入数字！");
         return;
     }
 
-    const int from_base = base_from_spin_->value();
-    const int to_base = base_to_spin_->value();
+    const int from_base = base_from_spin_->value(),
+              to_base = base_to_spin_->value();
     
-    if (!base_converter::is_valid_number(input, from_base)) {
+    if (!base_converter::is_valid_number(input, from_base))
+    {
         QMessageBox::warning(nullptr, "警告", "输入的数字与源进制不匹配！");
         return;
     }
@@ -1056,11 +1060,11 @@ void main_window::on_base_convert() const
     base_output_->setText(result);
 }
 
-// ===== Timestamp converter slots =====
 void main_window::on_timestamp_to_datetime() const
 {
-    QString timestamp_str = timestamp_input_->text().trimmed();
-    if (timestamp_str.isEmpty()) {
+    const QString timestamp_str = timestamp_input_->text().trimmed();
+    if (timestamp_str.isEmpty())
+    {
         QMessageBox::warning(nullptr, "警告", "请输入正确时间戳！");
         return;
     }
@@ -1077,7 +1081,7 @@ void main_window::on_datetime_to_timestamp() const
     const QString datetime_str = timestamp_datetime_->text().trimmed();
     if (datetime_str.isEmpty())
     {
-        QMessageBox::warning(nullptr, "警告", "请输入日期时间！");
+        QMessageBox::warning(nullptr, "警告", "需要输入日期时间");
         return;
     }
 
@@ -1086,18 +1090,17 @@ void main_window::on_datetime_to_timestamp() const
     if (const qint64 timestamp = timestamp_converter::datetime_to_timestamp(datetime_str, timezone); timestamp > 0)
         timestamp_input_->setText(QString::number(timestamp));
     else
-        QMessageBox::warning(nullptr, "错误", "无效的日期时间格式！请使用 yyyy-MM-dd hh:mm:ss");
+        QMessageBox::warning(nullptr, "错误", "无效的日期时间格式，请使用 yyyy-MM-dd hh:mm:ss");
 }
 
-// ===== Time Editor Slots =====
 void main_window::on_timestamp_edit_changed() const
 {
-    const int year = timestamp_year_->value();
-    const int month = timestamp_month_->value();
-    const int day = timestamp_day_->value();
-    const int hour = timestamp_hour_->value();
-    const int minute = timestamp_minute_->value();
-    const int second = timestamp_second_->value();
+    const int year = timestamp_year_->value(),
+              month = timestamp_month_->value(),
+              day = timestamp_day_->value(),
+              hour = timestamp_hour_->value(),
+              minute = timestamp_minute_->value(),
+              second = timestamp_second_->value();
     
     QString timezone = timestamp_timezone_->currentText();
 
@@ -1143,7 +1146,7 @@ void main_window::on_timestamp_sub_month() const
 
 void main_window::on_timestamp_add_day() const
 {
-    timestamp_day_->setValue(timestamp_day_->value() + 1);
+    timestamp_day_->setValue(timestamp_day_->value() + 1),
     on_timestamp_edit_changed();
 }
 
@@ -1215,17 +1218,16 @@ void main_window::on_timestamp_sub_second() const
         on_timestamp_edit_changed();
 }
 
-// ===== Text compare slots =====
 void main_window::on_text_compare() const
 {
-    const QString original = text_compare_original_->toPlainText();
-    const QString modified = text_compare_modified_->toPlainText();
+    const QString original = text_compare_original_->toPlainText(),
+                  modified = text_compare_modified_->toPlainText();
     
     text_diff::DiffResult result = text_diff::compare(original, modified);
     
     QString compare_result;
-    QStringList lines1 = original.split('\n');
-    QStringList lines2 = modified.split('\n');
+    QStringList lines1 = original.split('\n'),
+                lines2 = modified.split('\n');
     
     int i = 0, j = 0;
     while (i < lines1.size() || j < lines2.size())
@@ -1245,20 +1247,19 @@ void main_window::on_text_compare() const
     text_compare_result_->setPlainText(compare_result);
 }
 
-// ===== GZip slots =====
 void main_window::on_gzip_compress() const
 {
-    const QByteArray input = gzip_compress_input->toPlainText().toUtf8();
-    const QByteArray compressed = gzip_tool::x_compress(input);
-    const QString result = base64_tool::encode_bytes(compressed);  // Base64 encode
+    const QByteArray input = gzip_compress_input->toPlainText().toUtf8(),
+                     compressed = gzip_tool::x_compress(input);
+    const QString result = base64_tool::encode_bytes(compressed);
     
-    const qint64 originalSize = input.size();
-    const qint64 compressedSize = compressed.size();
+    const qint64 originalSize = input.size(),
+                 compressedSize = compressed.size();
     QString ratioStr;
     
-    if (originalSize > 0) {
-        double ratio = 0.0;
-        ratio = (1.0 - static_cast<double>(compressedSize) / originalSize) * 100.0;
+    if (originalSize > 0)
+    {
+        const double ratio = (1.0 - static_cast<double>(compressedSize) / originalSize) * 100.0;
         ratioStr = QString("原始大小: %1 字节 | 压缩后: %2 字节 | 压缩率: %3%")
             .arg(originalSize).arg(compressedSize).arg(ratio, 0, 'f', 1);
     }
@@ -1269,12 +1270,11 @@ void main_window::on_gzip_compress() const
 void main_window::on_gzip_decompress() const
 {
     const QString input = gzip_compress_input->toPlainText();
-    const QByteArray compressed = base64_tool::decode_to_bytes(input);  // Base64 decode
-    const QByteArray result = gzip_tool::decompress(compressed);
+    const QByteArray compressed = base64_tool::decode_to_bytes(input),
+                     result = gzip_tool::decompress(compressed);
     gzip_compress_output->setPlainText(QString::fromUtf8(result));
 }
 
-// ===== Hash tool slots =====
 void main_window::on_hash_generate() const
 {
     const QString input = hash_input_->toPlainText(),
@@ -1306,13 +1306,10 @@ void main_window::on_hash_generate() const
 void main_window::on_hash_select_file() const
 {
     if (const QString file_path = QFileDialog::getOpenFileName(nullptr, "选择文件", QString(), "All Files (*)"); !file_path.isEmpty())
-    {
-        hash_selected_file_ = file_path;
+        hash_selected_file_ = file_path,
         hash_input_->setPlaceholderText(QString("文件: %1").arg(file_path));
-    }
 }
 
-// ===== Password generator slots =====
 void main_window::on_password_generate() const
 {
     password_gen::PasswordConfig config;
@@ -1327,7 +1324,6 @@ void main_window::on_password_generate() const
     if (const QString password = password_gen::generate_password(config); !password.isEmpty())
     {
         password_result_->setText(password);
-
         const double entropy = password_gen::calculate_entropy(password);
         const QString strength = password_gen::evaluate_strength(entropy);
         password_strength_->setText(QString("密码强度: %1 (熵: %2)").arg(strength).arg(entropy, 0, 'f', 1));

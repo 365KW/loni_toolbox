@@ -16,7 +16,8 @@
 #include "lib_e/switch_button.h"
 #include "backend.h"
 
-class main_window : public QMainWindow {
+class main_window : public QMainWindow
+{
     Q_OBJECT
 public:
     explicit main_window(QWidget *parent = nullptr);
@@ -45,7 +46,8 @@ private slots:
     void on_rename_select_files() const;
     void on_rename_preview() const;
     void on_rename_apply() const;
-    void on_rename_undo() const;
+
+    static void on_rename_undo();
 
     void on_base_convert() const;
 
