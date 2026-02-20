@@ -29,6 +29,8 @@ private slots:
     void show_home() const;
     void toggle_view_mode();
 
+    static void open_help_document();
+
     void on_base64_encode() const;
     void on_base64_decode() const;
 

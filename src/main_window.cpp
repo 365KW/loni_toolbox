@@ -25,6 +25,8 @@
 #include <QStyleHints>
 #include <QCursor>
 #include <QMouseEvent>
+#include <QDesktopServices>
+#include <QUrl>
 
 main_window::main_window(QWidget *parent) : QMainWindow(parent)
 {
@@ -691,6 +693,10 @@ QWidget* main_window::create_settings_page()
         toggle_view_mode();
     });
 
+    auto *btn_help = new QPushButton("打开帮助文档", page);
+    connect(btn_help, &QPushButton::clicked, this, &main_window::open_help_document);
+    layout->addWidget(btn_help);
+
     auto *Common_setting_ = new QLabel("通用设置", page);
     QFont comm_sett_labed_font = Common_setting_->font();
     comm_sett_labed_font.setBold(true);
@@ -818,6 +824,11 @@ void main_window::show_home() const
 void main_window::toggle_view_mode()
 {
     darkmode_ = !darkmode_;set_style_();
+}
+
+void main_window::open_help_document() {
+    const QString helpPath = QCoreApplication::applicationDirPath() + "/help/helper.html";
+    QDesktopServices::openUrl(QUrl::fromLocalFile(helpPath));
 }
 
 void main_window::set_style_() const {
@@ -1243,10 +1254,10 @@ void main_window::on_gzip_compress() const
     
     const qint64 originalSize = input.size();
     const qint64 compressedSize = compressed.size();
-    double ratio = 0.0;
     QString ratioStr;
     
     if (originalSize > 0) {
+        double ratio = 0.0;
         ratio = (1.0 - static_cast<double>(compressedSize) / originalSize) * 100.0;
         ratioStr = QString("原始大小: %1 字节 | 压缩后: %2 字节 | 压缩率: %3%")
             .arg(originalSize).arg(compressedSize).arg(ratio, 0, 'f', 1);
